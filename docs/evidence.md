@@ -32,7 +32,7 @@ This document provides complete verification evidence for **Level 3: Orange Belt
 
 ### B. Split Bill Calculator (`SplitBillForm`)
 * **Equal Split**: Even division among all participants with remainder stroop handling.
-* **Custom Split**: User-defined allocations with strict mathematical balance constraint ($\sum \text{shares} = \text{total}$).
+* **Custom Split**: User-defined allocations with strict mathematical balance constraint (`sum(shares) == total`).
 * Single-click conversion into a settled batch payment.
 
 ### C. Shareable Payment Requests (`PaymentRequestManager`)
