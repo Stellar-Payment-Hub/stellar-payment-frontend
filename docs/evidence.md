@@ -95,7 +95,14 @@ This document provides complete verification evidence for **Level 2: Yellow Belt
 ---
 
 ## 10. Automated Tests & CI Verification
-* **Frontend**: 32 unit and component tests passing (`validation`, `wallet`, `transaction-status`, `multi-wallet`, `payment-tracker`).
+* **Frontend**: 34 unit and component tests passing (`validation`, `wallet`, `transaction-status`, `multi-wallet`, `payment-tracker`, `contract-read`).
 * **Backend**: 7 API and event idempotency tests passing.
 * **Contracts**: 5 Soroban unit tests verifying create, read, state machine transitions, and error handling.
 * **GitHub Actions CI**: Automated pipelines passing on all three repositories.
+
+---
+
+## 11. Live Production Deployment
+* **Hosting Platform**: Vercel
+* **Production URL**: [https://stellar-payment-frontend.vercel.app](https://stellar-payment-frontend.vercel.app)
+* **Status**: Live, verified, and communicating with Stellar Testnet & Soroban PaymentRegistry contract `CCBUEU...ETGY`.
