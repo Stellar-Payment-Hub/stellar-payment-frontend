@@ -1,6 +1,6 @@
 /**
  * Centralized Stellar Network Configuration.
- * Defaults strictly to Stellar Testnet for Level 1.
+ * Configured strictly for Stellar Testnet in Level 1 & Level 2.
  */
 export const STELLAR_CONFIG = {
   network: import.meta.env.VITE_STELLAR_NETWORK || 'testnet',
@@ -18,6 +18,12 @@ export const STELLAR_CONFIG = {
     'https://stellar.expert/explorer/testnet',
   baseFee: '100', // Base fee in stroops (0.00001 XLM)
   baseReserve: '1.0', // Stellar minimum reserve per account in XLM
+  contractId:
+    import.meta.env.VITE_STELLAR_CONTRACT_ID ||
+    'CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY',
+  backendUrl:
+    import.meta.env.VITE_BACKEND_URL ||
+    'http://localhost:4000',
 } as const;
 
 export type StellarConfig = typeof STELLAR_CONFIG;
