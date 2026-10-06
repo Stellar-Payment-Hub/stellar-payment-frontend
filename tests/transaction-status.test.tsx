@@ -16,7 +16,7 @@ describe('TransactionStatus Component', () => {
   it('renders success result with transaction hash and explorer link', () => {
     const mockSuccessResult = {
       status: 'success' as const,
-      hash: '3389e9f2f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889',
+      hash: '342eb1e83ad159e628bb047e741e95632717c45bb438eb7a87dbb401f0bc247f',
       ledger: 104250,
       recipient: 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5',
       amount: '25.00',
@@ -38,7 +38,7 @@ describe('TransactionStatus Component', () => {
       screen.getByText('25.00 XLM sent to recipient on Stellar Testnet')
     ).toBeInTheDocument();
     expect(screen.getByTestId('tx-hash-value')).toHaveTextContent(
-      '3389e9f2f1...aa607c8889'
+      '342eb1e83a...01f0bc247f'
     );
     expect(screen.getByTestId('explorer-tx-link')).toHaveAttribute(
       'href',
