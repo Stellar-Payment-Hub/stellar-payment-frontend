@@ -105,14 +105,14 @@ export function App() {
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
               <h1 className="brand-title">Stellar Payment Hub</h1>
-              <span className="brand-badge" style={{ background: 'linear-gradient(135deg, #f97316, #ea580c)' }}>
-                Level 3: Orange Belt
+              <span className="brand-badge" style={{ background: 'linear-gradient(135deg, #0284c7, #0369a1)', color: '#ffffff' }}>
+                Enterprise Settlement Platform
               </span>
               <span className="badge badge-network" style={{ fontSize: '0.65rem' }}>
                 Testnet Active
               </span>
             </div>
-            <p className="card-subtitle">Multi-Address Settlement, Programmable Contracts & Real-Time Sync</p>
+            <p className="card-subtitle">Programmable Settlement, Multi-Address Dispersal & Real-Time Sync</p>
           </div>
         </div>
 
@@ -226,7 +226,7 @@ export function App() {
                   </div>
                   <div>
                     <h3 className="card-title">Quick Actions</h3>
-                    <p className="card-subtitle">Level 3 Programmable Payment Operations</p>
+                    <p className="card-subtitle">Programmable Payment Operations</p>
                   </div>
                 </div>
               </div>
@@ -384,7 +384,7 @@ export function App() {
             <div className="card" style={{ background: 'linear-gradient(145deg, rgba(30,41,59,0.7), rgba(15,23,42,0.9))' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <CheckCircle size={16} className="text-cyan-400" />
-                <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Level 3 Architecture Online</h4>
+                <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Soroban Smart Engine Online</h4>
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
                 Operating with dual Soroban smart contracts: <strong>SettlementRouter</strong> (<code>CBX7MK...7U1E</code>) and <strong>PaymentRegistry</strong> (<code>CCBUEU...ETGY</code>) with verified inter-contract invocation, real-time event streaming, and multi-address settlement.
