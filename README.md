@@ -5,55 +5,76 @@
 [![Stellar Network](https://img.shields.io/badge/Stellar-Testnet-38bdf8)](https://stellar.org)
 [![Soroban Registry](https://img.shields.io/badge/Soroban-PaymentRegistry-a855f7)](https://stellar.expert/explorer/testnet/contract/CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY)
 [![Soroban Settlement](https://img.shields.io/badge/Soroban-SettlementRouter-f97316)](https://stellar.expert/explorer/testnet/contract/CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E)
+[![Tests Passing](https://img.shields.io/badge/Tests-40%2F40%20Passed-10b981)](https://github.com/Stellar-Payment-Hub/stellar-payment-frontend/actions)
 [![Wallets](https://img.shields.io/badge/Wallets-Freighter%20%7C%20Albedo%20%7C%20xBull-818cf8)](https://freighter.app)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?logo=typescript)](https://www.typescriptlang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg)](LICENSE)
 
-**Stellar Payment Hub** is an enterprise-grade, decentralized financial application and payment coordination platform built on the **Stellar Network** and **Soroban smart contracts**.
+**Stellar Payment Hub** is an enterprise-grade, decentralized payment application and programmable settlement platform built on the **Stellar Network** and **Soroban smart contracts**.
 
-It provides an end-to-end payment experience combining native XLM transfers, programmable smart contract payment registries, atomic multi-address disbursements, remainder-safe bill splitting, shareable payment requests, and real-time ledger synchronization.
+It delivers a unified, production-ready payment experience combining native peer-to-peer XLM transfers, atomic multi-address disbursements, remainder-safe expense splitting, shareable payment requests, a public creator tip jar, and real-time ledger synchronization.
 
 * **Live Public Demo**: [https://stellar-payment-frontend.vercel.app](https://stellar-payment-frontend.vercel.app)
-* **PaymentRegistry Contract Address**: [`CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY`](https://stellar.expert/explorer/testnet/contract/CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY)
 * **SettlementRouter Contract Address**: [`CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E`](https://stellar.expert/explorer/testnet/contract/CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E)
+* **PaymentRegistry Contract Address**: [`CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY`](https://stellar.expert/explorer/testnet/contract/CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY)
 * **Verifiable Testnet Transaction**: [`3389e9f2f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889`](https://stellar.expert/explorer/testnet/tx/3389e9f2f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889)
 
 ---
 
-## Core Capabilities
+## Core Features & Workflows
 
-### 1. Atomic Multi-Address Payments
-Disperse payments across multiple distinct Stellar accounts (2 to 10 recipients) in a single unified operation with strict mathematical verification (`sum(recipient amounts) == total amount`), duplicate address prevention, and available balance checks.
+### 1. Dashboard & Quick Actions
+* Real-time XLM balance retrieval directly from Stellar Horizon Testnet.
+* Available spendable balance calculation (deducting base reserve and subentries).
+* Built-in developer Friendbot funding utility (+10,000 Testnet XLM).
+* One-click action shortcuts to Send, Multi-Pay, Split, Invoices, Tip Jar, and Tracker.
 
-### 2. Bill Splitting Calculator
-* **Equal Split**: Evenly divides any bill total across participants, safely allocating remainder stroops without mathematical loss.
-* **Custom Split**: Accommodates variable share allocations while strictly enforcing mathematical balance.
+### 2. Atomic Multi-Address Payments (`MultiPaymentForm`)
+* Batch disbursement to multiple recipient addresses (2 to 10 accounts).
+* Dynamic recipient row addition and removal.
+* Mathematical validation enforcing `sum(recipient amounts) == total amount`.
+* Pre-flight protection against self-transfers, duplicate addresses, zero values, and insufficient funds.
 
-### 3. Shareable Payment Requests (Invoices)
-Generate branded invoice URLs with custom expiration windows, requested amounts, and reference memos. Any counterparty can connect their wallet and fulfill the invoice with on-chain settlement.
+### 3. Split Bill Calculator (`SplitBillForm`)
+* **Equal Split**: Automatic division among participants with remainder stroop allocation to eliminate rounding loss.
+* **Custom Split**: Individual allocation with strict mathematical balance enforcement before submission.
+* Direct conversion into a settled on-chain transaction.
 
-### 4. Creator Tip Jar
-A public payment portal with quick-tip presets (5, 10, 25, 50 XLM) or custom amounts, QR code profile presentation, and direct on-chain verification links.
+### 4. Shareable Invoices & Payment Requests (`PaymentRequestManager`)
+* Generate shareable payment requests with unique URLs (`?tab=payments&request=REQ-001`).
+* Configurable expiration windows, amount values, and reference descriptions.
+* Counterparty can connect any supported wallet and execute on-chain fulfillment.
 
-### 5. Payment Tracker 2.0
-Real-time monitoring hub with status tabs (`All`, `Pending`, `Processing`, `Completed`, `Failed`, `Cancelled`), Server-Sent Events (SSE) live updates, and **Nested Settlement Tree** inspection:
-```text
-Settlement #1 [100.0000 XLM]
- ├── Recipient A — 50.0000 XLM [Completed] (PAY-SUB-1)
- ├── Recipient B — 30.0000 XLM [Completed] (PAY-SUB-2)
- └── Recipient C — 20.0000 XLM [Completed] (PAY-SUB-3)
-```
+### 5. Creator Tip Jar (`TipJarView`)
+* Public tipping portal with quick-tip presets (5, 10, 25, 50 XLM) and custom amounts.
+* Dynamic QR code visual profile and immediate explorer link upon confirmation.
 
-### 6. Transaction Ledger
-Live transaction history detailing on-chain hashes, ledger sequence numbers, transaction categories (Native, Contract, Settlement, Tip), and Stellar Expert links.
+### 6. Payment Tracker 2.0 (`PaymentTracker`)
+* Dual-tab category switcher: Single Registry Payments and Multi-Address Settlements (`SETTLE-xxx`).
+* Status filtering: `All`, `Pending`, `Processing`, `Completed`, `Failed`, `Cancelled`.
+* **Nested Settlement Tree Inspection**:
+  ```text
+  Settlement #1 [100.0000 XLM]
+   ├── Recipient A — 50.0000 XLM [Completed] (PAY-SUB-1)
+   ├── Recipient B — 30.0000 XLM [Completed] (PAY-SUB-2)
+   └── Recipient C — 20.0000 XLM [Completed] (PAY-SUB-3)
+  ```
+* Real-time Server-Sent Events (SSE) synchronization displaying live ledger status changes without polling.
 
-### 7. Multi-Wallet Integration
-Modular wallet abstraction layer supporting **Freighter**, **Albedo**, and **xBull** with clean error states and network validation.
+### 7. Transaction Ledger (`TransactionHistoryView`)
+* Verifiable on-chain transaction feed with sequence numbers and status badges.
+* Filter by transaction type: `Native Payment`, `Contract Payment`, `Settlement`, `Tip`.
+* Direct links to inspect transactions on the Stellar Expert Explorer.
+
+### 8. Modular Multi-Wallet Integration
+* Connects via **Freighter**, **Albedo**, and **xBull**.
+* Network validation preventing accidental Mainnet execution during Testnet operations.
+* Clean disconnection and wallet switching workflows.
 
 ---
 
-## System Architecture
+## Architectural Topology
 
-### Application Flow
 ```text
 ┌────────────────────────────────────────────────────────┐
 │                        FRONTEND                        │
@@ -85,43 +106,26 @@ Modular wallet abstraction layer supporting **Freighter**, **Albedo**, and **xBu
               ┌───────────────────────────┐
               │     Soroban Contracts     │
               │                           │
-              │ SettlementRouter          │
-              │ PaymentRegistry           │
+              │ SettlementRouter (L3)     │
+              │ PaymentRegistry (L2)      │
               └───────────────────────────┘
-```
-
-### Soroban Cross-Contract Invocations
-```text
-┌─────────────────────────────────────────────────────────────────┐
-│                      SettlementRouter Contract                  │
-│             CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E │
-│                                                                 │
-│  execute_settlement(env, payer, total, recipients, memo)        │
-└───────────────────────────────┬─────────────────────────────────┘
-                                │
-                 Inter-Contract Cross-Invocation
-              PaymentRegistryClient::create_payment
-                                │
-                                ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                     PaymentRegistry Contract                    │
-│             CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY │
-│                                                                 │
-│  create_payment(env, creator, recipient, amount, memo)          │
-│  Storage: Persistent Map [payment_id -> PaymentRecord]          │
-│  Event: PaymentCreated(id, creator, recipient, amount)          │
-└─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Polyrepo Ecosystem
+## User-Facing Error Handling & Validation Catalog
 
-The Stellar Payment Hub is organized across three specialized repositories:
-
-1. **[stellar-payment-frontend](https://github.com/Stellar-Payment-Hub/stellar-payment-frontend)**: Modern React 18, TypeScript, and Vite dApp featuring responsive dark-mode styling, multi-wallet connectivity, settlement forms, and live tracker.
-2. **[stellar-payment-backend](https://github.com/Stellar-Payment-Hub/stellar-payment-backend)**: Express & TypeScript synchronization engine with idempotent Soroban event processing, transaction aggregation, rate limiting, and real-time SSE stream.
-3. **[stellar-payment-contracts](https://github.com/Stellar-Payment-Hub/stellar-payment-contracts)**: Rust workspace containing Soroban smart contracts (`SettlementRouter` and `PaymentRegistry`) with inter-contract dispatch and unit testing.
+| Category | Error Condition | User-Facing Message | Resolution |
+| :--- | :--- | :--- | :--- |
+| **Wallet** | Extension not installed | *"Wallet extension not detected. Please install Freighter or use Albedo."* | Prompt user with wallet download link |
+| **Wallet** | User rejects signing | *"Transaction rejected in your wallet. No funds were transferred."* | Allow user to modify parameters and retry |
+| **Wallet** | Wrong network | *"Connected wallet is on Public network. Please switch to Stellar Testnet."* | Network selector prompt |
+| **Payment** | Invalid Stellar address | *"Please enter a valid 56-character Stellar address starting with G."* | Enforce StrKey Ed25519 checksum validation |
+| **Payment** | Self-transfer attempt | *"Recipient address cannot be your own wallet address."* | User must specify a counterparty address |
+| **Payment** | Duplicate recipient | *"Duplicate recipient address detected in multi-payment batch."* | Deduplicate recipient entries |
+| **Payment** | Insufficient balance | *"Insufficient XLM balance. Amount exceeds your spendable funds."* | Check spendable balance calculation |
+| **Payment** | Split sum mismatch | *"Sum of participant shares must equal the total bill amount."* | Auto-balance or adjust individual shares |
+| **Payment** | Memo exceeds limit | *"Memo exceeds Stellar's 28-byte UTF-8 limit."* | Truncate or condense memo text |
 
 ---
 
@@ -133,35 +137,39 @@ The frontend maintains extensive automated test coverage across form validation,
 npm test
 ```
 
-### Test Output
+### Verified Test Output
 
 ```text
  RUN  v2.1.9 C:/Users/USER/.../stellar-payment-frontend
 
- ✓ tests/validation.test.ts (17 tests)
- ✓ tests/wallet.test.tsx (7 tests)
- ✓ tests/transaction-status.test.tsx (3 tests)
- ✓ tests/multi-wallet.test.tsx (3 tests)
- ✓ tests/payment-tracker.test.tsx (2 tests)
- ✓ tests/contract-read.test.tsx (2 tests)
- ✓ tests/level3-payments.test.tsx (6 tests)
+ ✓ tests/validation.test.ts (17 tests) 21ms
+ ✓ tests/wallet.test.tsx (7 tests) 145ms
+ ✓ tests/transaction-status.test.tsx (3 tests) 158ms
+ ✓ tests/multi-wallet.test.tsx (3 tests) 191ms
+ ✓ tests/payment-tracker.test.tsx (2 tests) 338ms
+ ✓ tests/contract-read.test.tsx (2 tests) 351ms
+ ✓ tests/level3-payments.test.tsx (6 tests) 521ms
 
  Test Files  7 passed (7)
       Tests  40 passed (40)
+   Duration  4.61s
 ```
 
 ---
 
-## Getting Started
+## Performance & UX Design
 
-### Prerequisites
-* Node.js v20+
-* Supported Stellar Wallet (Freighter, Albedo, or xBull)
+* **Zero Polling Overhead**: Replaces constant HTTP polling with a persistent Server-Sent Events (SSE) connection that pushes ledger updates to the UI in real time.
+* **Responsive Layouts**: Designed mobile-first with touch-friendly button targets, responsive card grids, and collapsible navigation for mobile, tablet, and desktop viewports.
+* **Optimistic Local Caching**: Instant UI state transitions with background on-chain confirmation verification.
+* **Theme & Typography**: Curated dark-mode palette using HSL color tokens, custom glow accents, and typography via Plus Jakarta Sans and JetBrains Mono.
 
-### Installation & Run
+---
+
+## Local Development & Setup
 
 ```bash
-# 1. Clone the repository
+# 1. Clone repository
 git clone https://github.com/Stellar-Payment-Hub/stellar-payment-frontend.git
 cd stellar-payment-frontend
 
@@ -171,7 +179,7 @@ npm install
 # 3. Configure environment
 cp .env.example .env
 
-# 4. Run tests
+# 4. Run automated test suite
 npm test
 
 # 5. Build production bundle
@@ -183,8 +191,13 @@ npm run dev
 
 ---
 
-## Security & Verification
+## Environment Variables
 
-* **Zero Private Key Storage**: Client-side signing is conducted strictly via connected wallet providers; private keys are never exposed to the frontend, backend, or network.
-* **On-Chain Verifiability**: Every transaction and settlement record produces a cryptographic hash verifiable on the official [Stellar Expert Explorer](https://stellar.expert/explorer/testnet).
-* **Safe Fallbacks**: Includes graceful offline fallbacks and resilient error messaging for wallet rejections, network errors, and balance constraints.
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `VITE_STELLAR_NETWORK` | Stellar network target | `testnet` |
+| `VITE_HORIZON_URL` | Stellar Horizon RPC endpoint | `https://horizon-testnet.stellar.org` |
+| `VITE_SOROBAN_RPC_URL` | Soroban RPC provider endpoint | `https://soroban-testnet.stellar.org` |
+| `VITE_PAYMENT_REGISTRY_CONTRACT` | PaymentRegistry contract address | `CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY` |
+| `VITE_SETTLEMENT_CONTRACT` | SettlementRouter contract address | `CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E` |
+| `VITE_BACKEND_URL` | Backend API and SSE stream endpoint | `http://localhost:3001` |
