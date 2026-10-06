@@ -1,6 +1,6 @@
 /**
  * Centralized Stellar Network Configuration.
- * Configured strictly for Stellar Testnet in Level 1 & Level 2.
+ * Configured strictly for Stellar Testnet across Level 1, Level 2, and Level 3.
  */
 export const STELLAR_CONFIG = {
   network: import.meta.env.VITE_STELLAR_NETWORK || 'testnet',
@@ -27,6 +27,9 @@ export const STELLAR_CONFIG = {
   contractId:
     import.meta.env.VITE_STELLAR_CONTRACT_ID ||
     'CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY',
+  settlementContractId:
+    import.meta.env.VITE_STELLAR_SETTLEMENT_CONTRACT_ID ||
+    'CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E',
   backendUrl:
     import.meta.env.VITE_BACKEND_URL ||
     'http://localhost:4000',
