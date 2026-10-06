@@ -4,9 +4,12 @@
 [![Stellar Network](https://img.shields.io/badge/Stellar-Testnet-38bdf8)](https://stellar.org)
 [![Soroban Contract](https://img.shields.io/badge/Soroban-PaymentRegistry-a855f7)](https://stellar.expert/explorer/testnet/contract/CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY)
 [![Wallets](https://img.shields.io/badge/Wallets-Freighter%20%7C%20Albedo%20%7C%20xBull-818cf8)](https://freighter.app)
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20on%20Vercel-000000?logo=vercel)](https://stellar-payment-frontend.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg)](LICENSE)
 
 Stellar Payment Hub is a multi-wallet, programmable payment coordination and tracking platform built on the **Stellar Network** and **Soroban smart contracts**.
+
+* **Live Demo URL**: [https://stellar-payment-frontend.vercel.app](https://stellar-payment-frontend.vercel.app)
 
 ---
 
