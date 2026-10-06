@@ -23,8 +23,8 @@ export async function getBaseFee(): Promise<string> {
   try {
     const server = getHorizonServer();
     const feeStats = await server.feeStats();
-    if (feeStats && feeStats.min_accepted_fee) {
-      return feeStats.min_accepted_fee;
+    if (feeStats && feeStats.fee_charged && feeStats.fee_charged.min) {
+      return feeStats.fee_charged.min;
     }
   } catch (err) {
     console.warn('[Horizon] Falling back to default base fee:', err);

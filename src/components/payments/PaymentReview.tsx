@@ -1,5 +1,4 @@
-import React from 'react';
-import { ArrowRight, ShieldCheck, AlertCircle, Loader2, X } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Loader2, X } from 'lucide-react';
 import { PaymentFormData, TransactionStatusState } from '../../types/payment';
 import { STELLAR_CONFIG } from '../../config/env';
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useWallet } from './hooks/useWallet';
 import { useBalance } from './hooks/useBalance';
 import { usePayment } from './hooks/usePayment';
@@ -9,7 +9,7 @@ import { SendPaymentForm } from './components/payments/SendPaymentForm';
 import { PaymentReview } from './components/payments/PaymentReview';
 import { TransactionStatus } from './components/payments/TransactionStatus';
 import { PaymentFormData } from './types/payment';
-import { Zap, Shield, ArrowUpRight, Github } from 'lucide-react';
+import { Zap, Shield, ArrowUpRight, Code2 } from 'lucide-react';
 
 export function App() {
   const {
@@ -177,7 +177,7 @@ export function App() {
             rel="noopener noreferrer"
             className="link-subtle"
           >
-            GitHub Org <Github size={13} />
+            GitHub Org <Code2 size={13} />
           </a>
         </div>
       </footer>
