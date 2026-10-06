@@ -3,8 +3,8 @@
 [![Frontend CI](https://github.com/Stellar-Payment-Hub/stellar-payment-frontend/actions/workflows/ci.yml/badge.svg)](https://github.com/Stellar-Payment-Hub/stellar-payment-frontend/actions/workflows/ci.yml)
 [![Live Demo](https://img.shields.io/badge/Demo-Live%20on%20Vercel-000000?logo=vercel)](https://stellar-payment-frontend.vercel.app)
 [![Stellar Network](https://img.shields.io/badge/Stellar-Testnet-38bdf8)](https://stellar.org)
-[![Soroban Registry](https://img.shields.io/badge/Soroban-PaymentRegistry-a855f7)](https://stellar.expert/explorer/testnet/contract/CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY)
-[![Soroban Settlement](https://img.shields.io/badge/Soroban-SettlementRouter-f97316)](https://stellar.expert/explorer/testnet/contract/CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E)
+[![Soroban Registry](https://img.shields.io/badge/Soroban-PaymentRegistry-a855f7)](https://stellar.expert/explorer/testnet/contract/CD5D7OITCBFJJDHQVEZ6Y7MYIZSWEVOCQO4ES7WZEWW3S37IGUVZAI7S)
+[![Soroban Settlement](https://img.shields.io/badge/Soroban-SettlementRouter-f97316)](https://stellar.expert/explorer/testnet/contract/CAGDS3H6GSNB7FSSFFDAAO5MX3GNVCUBNKIVUI52TAK7PXUUEXYCM66E)
 [![Tests Passing](https://img.shields.io/badge/Tests-40%2F40%20Passed-10b981)](https://github.com/Stellar-Payment-Hub/stellar-payment-frontend/actions)
 [![Wallets](https://img.shields.io/badge/Wallets-Freighter%20%7C%20Albedo%20%7C%20xBull-818cf8)](https://freighter.app)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6?logo=typescript)](https://www.typescriptlang.org/)
@@ -15,8 +15,8 @@
 It delivers a unified, production-ready payment experience combining native peer-to-peer XLM transfers, atomic multi-address disbursements, remainder-safe expense splitting, shareable payment requests, a public creator tip jar, and real-time ledger synchronization.
 
 * **Live Public Demo**: [https://stellar-payment-frontend.vercel.app](https://stellar-payment-frontend.vercel.app)
-* **SettlementRouter Contract Address**: [`CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E`](https://stellar.expert/explorer/testnet/contract/CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E)
-* **PaymentRegistry Contract Address**: [`CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY`](https://stellar.expert/explorer/testnet/contract/CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY)
+* **SettlementRouter Contract Address**: [`CAGDS3H6GSNB7FSSFFDAAO5MX3GNVCUBNKIVUI52TAK7PXUUEXYCM66E`](https://stellar.expert/explorer/testnet/contract/CAGDS3H6GSNB7FSSFFDAAO5MX3GNVCUBNKIVUI52TAK7PXUUEXYCM66E)
+* **PaymentRegistry Contract Address**: [`CD5D7OITCBFJJDHQVEZ6Y7MYIZSWEVOCQO4ES7WZEWW3S37IGUVZAI7S`](https://stellar.expert/explorer/testnet/contract/CD5D7OITCBFJJDHQVEZ6Y7MYIZSWEVOCQO4ES7WZEWW3S37IGUVZAI7S)
 * **Verifiable Testnet Transaction**: [`3389e9f2f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889`](https://stellar.expert/explorer/testnet/tx/3389e9f2f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889)
 
 ---
@@ -198,6 +198,6 @@ npm run dev
 | `VITE_STELLAR_NETWORK` | Stellar network target | `testnet` |
 | `VITE_HORIZON_URL` | Stellar Horizon RPC endpoint | `https://horizon-testnet.stellar.org` |
 | `VITE_SOROBAN_RPC_URL` | Soroban RPC provider endpoint | `https://soroban-testnet.stellar.org` |
-| `VITE_PAYMENT_REGISTRY_CONTRACT` | PaymentRegistry contract address | `CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY` |
-| `VITE_SETTLEMENT_CONTRACT` | SettlementRouter contract address | `CBX7MKY4M2PQL5WR6B4GXZV8KTD2NQ3J9F1H5C7S0L8D4Y6A2V9W7U1E` |
+| `VITE_PAYMENT_REGISTRY_CONTRACT` | PaymentRegistry contract address | `CD5D7OITCBFJJDHQVEZ6Y7MYIZSWEVOCQO4ES7WZEWW3S37IGUVZAI7S` |
+| `VITE_SETTLEMENT_CONTRACT` | SettlementRouter contract address | `CAGDS3H6GSNB7FSSFFDAAO5MX3GNVCUBNKIVUI52TAK7PXUUEXYCM66E` |
 | `VITE_BACKEND_URL` | Backend API and SSE stream endpoint | `http://localhost:3001` |
