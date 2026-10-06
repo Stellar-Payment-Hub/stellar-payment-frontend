@@ -22,7 +22,7 @@ It provides an end-to-end payment experience combining native XLM transfers, pro
 ## Core Capabilities
 
 ### 1. Atomic Multi-Address Payments
-Disperse payments across multiple distinct Stellar accounts (2 to 10 recipients) in a single unified operation with strict mathematical verification ($\sum \text{recipient amounts} = \text{total amount}$), duplicate address prevention, and available balance checks.
+Disperse payments across multiple distinct Stellar accounts (2 to 10 recipients) in a single unified operation with strict mathematical verification (`sum(recipient amounts) == total amount`), duplicate address prevention, and available balance checks.
 
 ### 2. Bill Splitting Calculator
 * **Equal Split**: Evenly divides any bill total across participants, safely allocating remainder stroops without mathematical loss.
