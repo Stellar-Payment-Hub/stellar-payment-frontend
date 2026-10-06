@@ -36,6 +36,13 @@ export function validateRecipient(
 }
 
 /**
+ * Check if a string is a valid Stellar address
+ */
+export function isValidAddress(address: string): boolean {
+  return validateRecipient(address) === null;
+}
+
+/**
  * Validate the payment XLM amount.
  * Rejects empty, non-numeric, zero, negative, or amounts exceeding available spendable balance.
  */
