@@ -21,7 +21,7 @@ describe('ContractReader Component (Section 16: Contract Read Operations)', () =
       createdAt: 'Oct 6, 2026',
       updatedAt: 'Oct 6, 2026',
       source: 'soroban_rpc',
-      contractAddress: 'CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY',
+      contractAddress: 'CD5D7OITCBFJJDHQVEZ6Y7MYIZSWEVOCQO4ES7WZEWW3S37IGUVZAI7S',
     });
 
     render(<ContractReader />);
