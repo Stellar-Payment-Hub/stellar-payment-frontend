@@ -1,5 +1,4 @@
-import React from 'react';
-import { Wallet, LogOut, AlertCircle, ExternalLink, Loader2 } from 'lucide-react';
+import { Wallet, LogOut, AlertCircle, Loader2 } from 'lucide-react';
 import { WalletStatusState } from '../../types/wallet';
 import { WalletAddress } from './WalletAddress';
 
@@ -7,19 +6,17 @@ interface WalletConnectProps {
   status: WalletStatusState;
   address: string | null;
   error: string | null;
-  isInstalled: boolean;
-  onConnect: () => void;
+  onOpenSelect: () => void;
   onDisconnect: () => void;
 }
 
-export const WalletConnect: React.FC<WalletConnectProps> = ({
+export const WalletConnect = ({
   status,
   address,
   error,
-  isInstalled,
-  onConnect,
+  onOpenSelect,
   onDisconnect,
-}) => {
+}: WalletConnectProps) => {
   if (status === 'connected' && address) {
     return (
       <div className="wallet-connected-container" data-testid="wallet-connected-container">
@@ -39,21 +36,6 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
 
   return (
     <div className="wallet-connect-wrapper">
-      {!isInstalled && (
-        <div className="extension-banner" data-testid="extension-missing-banner">
-          <AlertCircle size={15} />
-          <span>Freighter extension not detected.</span>
-          <a
-            href="https://www.freighter.app/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="link-inline"
-          >
-            Install Freighter <ExternalLink size={12} />
-          </a>
-        </div>
-      )}
-
       {error && (
         <div className="wallet-error-banner" data-testid="wallet-error-banner">
           <AlertCircle size={15} />
@@ -64,14 +46,14 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
       <button
         type="button"
         className="btn btn-primary"
-        onClick={onConnect}
+        onClick={onOpenSelect}
         disabled={status === 'connecting'}
         data-testid="connect-wallet-btn"
       >
         {status === 'connecting' ? (
           <>
             <Loader2 size={16} className="animate-spin" />
-            <span>Connecting Freighter...</span>
+            <span>Connecting...</span>
           </>
         ) : (
           <>

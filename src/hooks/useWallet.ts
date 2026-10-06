@@ -1,63 +1,96 @@
 import { useState, useEffect, useCallback } from 'react';
-import { WalletStatusState } from '../types/wallet';
-import {
-  connectFreighter,
-  isFreighterInstalled,
-} from '../lib/wallet/freighter';
+import { WalletStatusState, WalletType } from '../types/wallet';
+import { walletService, SUPPORTED_WALLETS } from '../services/wallet';
 import { STELLAR_CONFIG } from '../config/env';
 
-const STORAGE_KEY = 'sph_wallet_connected';
+const STORAGE_CONNECTED_KEY = 'sph_wallet_connected';
+const STORAGE_TYPE_KEY = 'sph_wallet_type';
 
 export function useWallet() {
   const [status, setStatus] = useState<WalletStatusState>('disconnected');
   const [address, setAddress] = useState<string | null>(null);
+  const [activeWallet, setActiveWallet] = useState<WalletType | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isInstalled, setIsInstalled] = useState<boolean>(true);
+  const [isSelectModalOpen, setIsSelectModalOpen] = useState<boolean>(false);
 
-  // Check Freighter installation on mount
-  const checkInstallation = useCallback(async (): Promise<boolean> => {
-    const installed = await isFreighterInstalled();
-    setIsInstalled(installed);
-    return installed;
+  // Check saved connection on mount
+  useEffect(() => {
+    const wasConnected = localStorage.getItem(STORAGE_CONNECTED_KEY);
+    const savedType = localStorage.getItem(STORAGE_TYPE_KEY) as WalletType | null;
+
+    if (wasConnected === 'true' && savedType) {
+      // Re-hydrate connection silently
+      walletService
+        .connect(savedType)
+        .then((pubKey) => {
+          setAddress(pubKey);
+          setActiveWallet(savedType);
+          setStatus('connected');
+        })
+        .catch(() => {
+          localStorage.removeItem(STORAGE_CONNECTED_KEY);
+          localStorage.removeItem(STORAGE_TYPE_KEY);
+        });
+    }
   }, []);
 
-  useEffect(() => {
-    checkInstallation();
-  }, [checkInstallation]);
-
-  // Connect to Freighter
-  const connect = useCallback(async () => {
+  const connect = useCallback(async (walletType: WalletType = 'freighter') => {
     setStatus('connecting');
     setError(null);
 
     try {
-      const pubKey = await connectFreighter();
+      const pubKey = await walletService.connect(walletType);
       setAddress(pubKey);
+      setActiveWallet(walletType);
       setStatus('connected');
-      localStorage.setItem(STORAGE_KEY, 'true');
+      setIsSelectModalOpen(false);
+
+      localStorage.setItem(STORAGE_CONNECTED_KEY, 'true');
+      localStorage.setItem(STORAGE_TYPE_KEY, walletType);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to connect wallet';
+
+      if (msg.toLowerCase().includes('not detected') || msg.toLowerCase().includes('not installed')) {
+        setStatus('not_found');
+      } else if (msg.toLowerCase().includes('declined') || msg.toLowerCase().includes('reject')) {
+        setStatus('rejected');
+      } else {
+        setStatus('error');
+      }
+
       setError(msg);
-      setStatus('error');
     }
   }, []);
 
-  // Disconnect from wallet
   const disconnect = useCallback(() => {
     setAddress(null);
+    setActiveWallet(null);
     setStatus('disconnected');
     setError(null);
-    localStorage.removeItem(STORAGE_KEY);
+
+    localStorage.removeItem(STORAGE_CONNECTED_KEY);
+    localStorage.removeItem(STORAGE_TYPE_KEY);
+  }, []);
+
+  const openSelectModal = useCallback(() => {
+    setIsSelectModalOpen(true);
+  }, []);
+
+  const closeSelectModal = useCallback(() => {
+    setIsSelectModalOpen(false);
   }, []);
 
   return {
     status,
     address,
+    activeWallet,
     error,
     network: STELLAR_CONFIG.network,
-    isInstalled,
+    isSelectModalOpen,
+    openSelectModal,
+    closeSelectModal,
     connect,
     disconnect,
-    checkInstallation,
+    availableWallets: SUPPORTED_WALLETS,
   };
 }

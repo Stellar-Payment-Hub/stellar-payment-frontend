@@ -1,22 +1,23 @@
-import React from 'react';
 import { WalletStatusState } from '../../types/wallet';
 
 interface WalletStatusProps {
   status: WalletStatusState;
   network?: string;
+  activeWallet?: string | null;
 }
 
-export const WalletStatus: React.FC<WalletStatusProps> = ({
+export const WalletStatus = ({
   status,
   network = 'testnet',
-}) => {
+  activeWallet,
+}: WalletStatusProps) => {
   const getStatusBadge = () => {
     switch (status) {
       case 'connected':
         return (
           <span className="badge badge-success" data-testid="status-connected">
             <span className="dot dot-success"></span>
-            Connected
+            {activeWallet ? `${activeWallet.toUpperCase()}` : 'Connected'}
           </span>
         );
       case 'connecting':
@@ -24,6 +25,27 @@ export const WalletStatus: React.FC<WalletStatusProps> = ({
           <span className="badge badge-warning" data-testid="status-connecting">
             <span className="dot dot-warning pulse"></span>
             Connecting...
+          </span>
+        );
+      case 'not_found':
+        return (
+          <span className="badge badge-danger" data-testid="status-not-found">
+            <span className="dot dot-danger"></span>
+            Wallet Not Found
+          </span>
+        );
+      case 'rejected':
+        return (
+          <span className="badge badge-warning" data-testid="status-rejected">
+            <span className="dot dot-warning"></span>
+            Rejected
+          </span>
+        );
+      case 'network_mismatch':
+        return (
+          <span className="badge badge-danger" data-testid="status-mismatch">
+            <span className="dot dot-danger"></span>
+            Network Mismatch
           </span>
         );
       case 'error':
