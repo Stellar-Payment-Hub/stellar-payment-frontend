@@ -8,6 +8,10 @@ import { WalletSelectModal } from './components/wallet/WalletSelectModal';
 import { BalanceCard } from './components/balance/BalanceCard';
 import { SendPaymentForm } from './components/payments/SendPaymentForm';
 import { CreateTrackedPaymentForm } from './components/payments/CreateTrackedPaymentForm';
+import { MultiPaymentForm } from './components/payments/MultiPaymentForm';
+import { SplitBillForm } from './components/payments/SplitBillForm';
+import { PaymentRequestManager } from './components/payments/PaymentRequestManager';
+import { TipJarView } from './components/tipjar/TipJarView';
 import { PaymentReview } from './components/payments/PaymentReview';
 import { TransactionStatus } from './components/payments/TransactionStatus';
 import { PaymentTracker } from './components/tracker/PaymentTracker';
@@ -24,6 +28,10 @@ import {
   Wallet,
   Code2,
   CheckCircle,
+  Users,
+  Split,
+  FileText,
+  Heart,
 } from 'lucide-react';
 
 export type TabView =
@@ -31,12 +39,20 @@ export type TabView =
   | 'payments'
   | 'tracker'
   | 'transactions'
+  | 'tipjar'
   | 'wallet'
   | 'developer';
 
+export type PaymentsSubView =
+  | 'single'
+  | 'multi'
+  | 'split'
+  | 'requests';
+
 export function App() {
   const [activeTab, setActiveTab] = useState<TabView>('dashboard');
-  const [paymentsSubView, setPaymentsSubView] = useState<'native' | 'contract'>('contract');
+  const [paymentsSubView, setPaymentsSubView] = useState<PaymentsSubView>('single');
+  const [singlePaymentType, setSinglePaymentType] = useState<'contract' | 'native'>('contract');
 
   const {
     status: walletStatus,
@@ -87,11 +103,16 @@ export function App() {
             <Zap size={22} className="text-cyan-400" />
           </div>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
               <h1 className="brand-title">Stellar Payment Hub</h1>
-              <span className="brand-badge">Level 2: Yellow Belt</span>
+              <span className="brand-badge" style={{ background: 'linear-gradient(135deg, #f97316, #ea580c)' }}>
+                Level 3: Orange Belt
+              </span>
+              <span className="badge badge-network" style={{ fontSize: '0.65rem' }}>
+                Testnet Active
+              </span>
             </div>
-            <p className="card-subtitle">Multi-Wallet Programmable Settlement Platform</p>
+            <p className="card-subtitle">Multi-Address Settlement, Programmable Contracts & Real-Time Sync</p>
           </div>
         </div>
 
@@ -111,7 +132,7 @@ export function App() {
         </div>
       </header>
 
-      {/* Main Navigation Tabs - 6 Major Areas (Section 2) */}
+      {/* Main Navigation Tabs */}
       <nav className="filter-tabs-scroll" style={{ padding: '0 0.25rem', marginBottom: '1.5rem' }}>
         <button
           type="button"
@@ -155,6 +176,16 @@ export function App() {
 
         <button
           type="button"
+          className={`filter-tab-btn ${activeTab === 'tipjar' ? 'active' : ''}`}
+          onClick={() => setActiveTab('tipjar')}
+          data-testid="tab-tipjar"
+        >
+          <Heart size={13} style={{ marginRight: '0.35rem', verticalAlign: '-1px', color: '#f43f5e' }} />
+          Tip Jar
+        </button>
+
+        <button
+          type="button"
           className={`filter-tab-btn ${activeTab === 'wallet' ? 'active' : ''}`}
           onClick={() => setActiveTab('wallet')}
           data-testid="tab-wallet"
@@ -170,7 +201,7 @@ export function App() {
           data-testid="tab-developer"
         >
           <Code2 size={13} style={{ marginRight: '0.35rem', verticalAlign: '-1px' }} />
-          Developer/Testnet
+          Developer/Faucet
         </button>
       </nav>
 
@@ -195,40 +226,67 @@ export function App() {
                   </div>
                   <div>
                     <h3 className="card-title">Quick Actions</h3>
-                    <p className="card-subtitle">Programmable Stellar Hub Operations</p>
+                    <p className="card-subtitle">Level 3 Programmable Payment Operations</p>
                   </div>
                 </div>
               </div>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                Seamlessly transfer native XLM or register smart payment records on the Soroban <strong>PaymentRegistry</strong> contract.
+                Execute native transfers, multi-address batch settlements, bill splitting, and smart invoices powered by Soroban smart contracts.
               </p>
-              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                <button
-                  type="button"
-                  className="btn btn-secondary btn-sm"
-                  onClick={() => {
-                    setPaymentsSubView('native');
-                    setActiveTab('payments');
-                  }}
-                >
-                  <Send size={13} style={{ marginRight: '0.3rem' }} /> Direct Send XLM
-                </button>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '0.65rem' }}>
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
                   onClick={() => {
-                    setPaymentsSubView('contract');
+                    setPaymentsSubView('single');
                     setActiveTab('payments');
                   }}
                 >
-                  <Sparkles size={13} style={{ marginRight: '0.3rem' }} /> New Tracked Payment
+                  <Send size={13} style={{ marginRight: '0.3rem' }} /> Single Send
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    setPaymentsSubView('multi');
+                    setActiveTab('payments');
+                  }}
+                >
+                  <Users size={13} style={{ marginRight: '0.3rem' }} /> Multi-Address
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    setPaymentsSubView('split');
+                    setActiveTab('payments');
+                  }}
+                >
+                  <Split size={13} style={{ marginRight: '0.3rem' }} /> Split Bill
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => {
+                    setPaymentsSubView('requests');
+                    setActiveTab('payments');
+                  }}
+                >
+                  <FileText size={13} style={{ marginRight: '0.3rem' }} /> Invoices
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setActiveTab('tipjar')}
+                >
+                  <Heart size={13} style={{ marginRight: '0.3rem', color: '#f43f5e' }} /> Tip Jar
                 </button>
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
                   onClick={() => setActiveTab('tracker')}
                 >
-                  <Layers size={13} style={{ marginRight: '0.3rem' }} /> View Payment Tracker
+                  <Layers size={13} style={{ marginRight: '0.3rem' }} /> Tracker 2.0
                 </button>
               </div>
             </div>
@@ -243,8 +301,8 @@ export function App() {
                     <Layers size={18} />
                   </div>
                   <div>
-                    <h3 className="card-title">Payment Activity</h3>
-                    <p className="card-subtitle">Recent Lifecycle Events</p>
+                    <h3 className="card-title">Settlement Activity</h3>
+                    <p className="card-subtitle">Recent Lifecycle & Multi-Recipient Events</p>
                   </div>
                 </div>
                 <button
@@ -252,7 +310,7 @@ export function App() {
                   className="btn btn-secondary btn-sm"
                   onClick={() => setActiveTab('tracker')}
                 >
-                  Open Full Tracker
+                  Open Tracker
                 </button>
               </div>
 
@@ -269,8 +327,29 @@ export function App() {
                   }}
                 >
                   <div>
+                    <strong style={{ fontSize: '0.85rem', display: 'block', color: 'var(--cyan-400)' }}>SETTLE-001</strong>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Core Contributor Bounty (3 Recipients)</span>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>100.0000 XLM</span>
+                    <span className="status-badge status-completed" style={{ fontSize: '0.65rem' }}>Completed</span>
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '0.75rem',
+                    background: 'var(--bg-primary)',
+                    borderRadius: 'var(--radius-md)',
+                    border: '1px solid var(--border-color)',
+                  }}
+                >
+                  <div>
                     <strong style={{ fontSize: '0.85rem', display: 'block' }}>PAY-001</strong>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Invoice #1042</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Audit Fee #1042</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>25.0000 XLM</span>
@@ -291,32 +370,11 @@ export function App() {
                 >
                   <div>
                     <strong style={{ fontSize: '0.85rem', display: 'block' }}>PAY-002</strong>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Domain Renewal</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Infrastructure Support</span>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <span style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>10.0000 XLM</span>
                     <span className="status-badge status-completed" style={{ fontSize: '0.65rem' }}>Completed</span>
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '0.75rem',
-                    background: 'var(--bg-primary)',
-                    borderRadius: 'var(--radius-md)',
-                    border: '1px solid var(--border-color)',
-                  }}
-                >
-                  <div>
-                    <strong style={{ fontSize: '0.85rem', display: 'block' }}>PAY-003</strong>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Project Advance</span>
-                  </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, display: 'block' }}>15.5000 XLM</span>
-                    <span className="status-badge status-processing" style={{ fontSize: '0.65rem' }}>Processing</span>
                   </div>
                 </div>
               </div>
@@ -326,66 +384,132 @@ export function App() {
             <div className="card" style={{ background: 'linear-gradient(145deg, rgba(30,41,59,0.7), rgba(15,23,42,0.9))' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <CheckCircle size={16} className="text-cyan-400" />
-                <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Level 2 Architecture Active</h4>
+                <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Level 3 Architecture Online</h4>
               </div>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0 }}>
-                Integrated with <strong>StellarWalletsKit</strong>, deployed <strong>Soroban PaymentRegistry</strong> (<code>CCBUEU...ETGY</code>), and backend real-time event pipeline with Server-Sent Events.
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
+                Operating with dual Soroban smart contracts: <strong>SettlementRouter</strong> (<code>CBX7MK...7U1E</code>) and <strong>PaymentRegistry</strong> (<code>CCBUEU...ETGY</code>) with verified inter-contract invocation, real-time event streaming, and multi-address settlement.
               </p>
             </div>
           </div>
         </main>
       )}
 
-      {/* View 2: Payments */}
+      {/* View 2: Payments Hub */}
       {activeTab === 'payments' && (
         <main className="dashboard-grid">
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div className="card">
-              <div className="card-header">
-                <div className="card-title-group">
-                  <div className="icon-badge icon-badge-cyan">
-                    <Send size={18} />
+              {/* Payments Sub-Navigation Tabs */}
+              <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem' }}>
+                <button
+                  type="button"
+                  className={`btn ${paymentsSubView === 'single' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  onClick={() => setPaymentsSubView('single')}
+                  data-testid="subtab-single"
+                >
+                  <Send size={13} style={{ marginRight: '0.3rem' }} /> Single Send
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${paymentsSubView === 'multi' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  onClick={() => setPaymentsSubView('multi')}
+                  data-testid="subtab-multi"
+                >
+                  <Users size={13} style={{ marginRight: '0.3rem' }} /> Multi-Address
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${paymentsSubView === 'split' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  onClick={() => setPaymentsSubView('split')}
+                  data-testid="subtab-split"
+                >
+                  <Split size={13} style={{ marginRight: '0.3rem' }} /> Split Bill
+                </button>
+                <button
+                  type="button"
+                  className={`btn ${paymentsSubView === 'requests' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                  onClick={() => setPaymentsSubView('requests')}
+                  data-testid="subtab-requests"
+                >
+                  <FileText size={13} style={{ marginRight: '0.3rem' }} /> Payment Requests
+                </button>
+              </div>
+
+              {/* Sub-view: Single Payment */}
+              {paymentsSubView === 'single' && (
+                <div>
+                  <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem' }}>
+                    <button
+                      type="button"
+                      className={`btn ${singlePaymentType === 'contract' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                      onClick={() => setSinglePaymentType('contract')}
+                    >
+                      <Sparkles size={13} style={{ marginRight: '0.3rem' }} /> Tracked Payment (Soroban)
+                    </button>
+                    <button
+                      type="button"
+                      className={`btn ${singlePaymentType === 'native' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+                      onClick={() => setSinglePaymentType('native')}
+                    >
+                      <Send size={13} style={{ marginRight: '0.3rem' }} /> Direct Send XLM (Native)
+                    </button>
                   </div>
-                  <div>
-                    <h3 className="card-title">Payment Hub</h3>
-                    <p className="card-subtitle">Choose Direct Transfer or Soroban Tracked Payment</p>
-                  </div>
+
+                  {singlePaymentType === 'contract' ? (
+                    <CreateTrackedPaymentForm
+                      senderAddress={address}
+                      spendableBalance={balanceState.spendableBalance}
+                      activeWallet={activeWallet}
+                      onPaymentCreated={() => {
+                        balanceState.refetch();
+                        setActiveTab('tracker');
+                      }}
+                    />
+                  ) : (
+                    <SendPaymentForm
+                      senderAddress={address}
+                      spendableBalance={balanceState.spendableBalance}
+                      onReview={handleStartReview}
+                      disabled={txStatus === 'submitting' || txStatus === 'awaiting_signature'}
+                    />
+                  )}
                 </div>
-              </div>
+              )}
 
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                <button
-                  type="button"
-                  className={`btn ${paymentsSubView === 'contract' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-                  onClick={() => setPaymentsSubView('contract')}
-                >
-                  <Sparkles size={13} style={{ marginRight: '0.3rem' }} /> Tracked Payment (Soroban)
-                </button>
-                <button
-                  type="button"
-                  className={`btn ${paymentsSubView === 'native' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
-                  onClick={() => setPaymentsSubView('native')}
-                >
-                  <Send size={13} style={{ marginRight: '0.3rem' }} /> Direct Send XLM (Native)
-                </button>
-              </div>
-
-              {paymentsSubView === 'contract' ? (
-                <CreateTrackedPaymentForm
+              {/* Sub-view: Multi-Address Payment */}
+              {paymentsSubView === 'multi' && (
+                <MultiPaymentForm
                   senderAddress={address}
                   spendableBalance={balanceState.spendableBalance}
                   activeWallet={activeWallet}
-                  onPaymentCreated={() => {
+                  onSettlementSuccess={() => {
                     balanceState.refetch();
                     setActiveTab('tracker');
                   }}
                 />
-              ) : (
-                <SendPaymentForm
+              )}
+
+              {/* Sub-view: Split Bill */}
+              {paymentsSubView === 'split' && (
+                <SplitBillForm
                   senderAddress={address}
                   spendableBalance={balanceState.spendableBalance}
-                  onReview={handleStartReview}
-                  disabled={txStatus === 'submitting' || txStatus === 'awaiting_signature'}
+                  activeWallet={activeWallet}
+                  onSplitSuccess={() => {
+                    balanceState.refetch();
+                    setActiveTab('tracker');
+                  }}
+                />
+              )}
+
+              {/* Sub-view: Payment Requests */}
+              {paymentsSubView === 'requests' && (
+                <PaymentRequestManager
+                  connectedAddress={address}
+                  activeWallet={activeWallet}
+                  onPaid={() => {
+                    balanceState.refetch();
+                  }}
                 />
               )}
             </div>
@@ -409,21 +533,35 @@ export function App() {
         </main>
       )}
 
-      {/* View 3: Payment Tracker */}
+      {/* View 3: Payment Tracker 2.0 */}
       {activeTab === 'tracker' && (
         <main style={{ maxWidth: '100%' }}>
           <PaymentTracker />
         </main>
       )}
 
-      {/* View 4: Transactions */}
+      {/* View 4: Transactions Ledger */}
       {activeTab === 'transactions' && (
         <main style={{ maxWidth: '100%' }}>
           <TransactionHistoryView />
         </main>
       )}
 
-      {/* View 5: Wallet */}
+      {/* View 5: Tip Jar */}
+      {activeTab === 'tipjar' && (
+        <main style={{ maxWidth: '100%' }}>
+          <TipJarView
+            defaultRecipient={address || 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN'}
+            connectedAddress={address}
+            activeWallet={activeWallet}
+            onTipSuccess={() => {
+              balanceState.refetch();
+            }}
+          />
+        </main>
+      )}
+
+      {/* View 6: Wallet Management */}
       {activeTab === 'wallet' && (
         <main style={{ maxWidth: '100%' }}>
           <WalletDetailView
@@ -441,7 +579,7 @@ export function App() {
         </main>
       )}
 
-      {/* View 6: Developer/Testnet */}
+      {/* View 7: Developer/Testnet View */}
       {activeTab === 'developer' && (
         <main style={{ maxWidth: '100%' }}>
           <DeveloperTestnetView />
@@ -469,4 +607,5 @@ export function App() {
     </div>
   );
 }
+
 export default App;

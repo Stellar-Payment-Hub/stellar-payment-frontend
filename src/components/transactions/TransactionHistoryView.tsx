@@ -1,54 +1,32 @@
-import { useState } from 'react';
-import { ExternalLink, CheckCircle, Clock, XCircle, ArrowUpRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ExternalLink, CheckCircle, Clock, XCircle, ArrowUpRight, RefreshCw, Filter } from 'lucide-react';
 import { STELLAR_CONFIG } from '../../config/env';
-
-export interface TxItem {
-  hash: string;
-  type: 'Contract Call' | 'Native XLM';
-  amount: string;
-  destination: string;
-  timestamp: string;
-  status: 'Success' | 'Pending' | 'Failed';
-  ledger: number;
-}
-
-const INITIAL_TXS: TxItem[] = [
-  {
-    hash: '3389e9f2f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889',
-    type: 'Contract Call',
-    amount: '25.0000 XLM',
-    destination: 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN',
-    timestamp: '2026-10-06 11:30:00 UTC',
-    status: 'Success',
-    ledger: 104250,
-  },
-  {
-    hash: '9a7b6c5d4e3f210987654321fedcba0987654321fedcba0987654321fedcba09',
-    type: 'Contract Call',
-    amount: '10.0000 XLM',
-    destination: 'GCA3HNDW4F4D3C57Q5P7LGL7HCKH6I2YFUKM2Y6W6X7XF5Q2VLL4X7R7',
-    timestamp: '2026-10-06 11:00:00 UTC',
-    status: 'Success',
-    ledger: 104100,
-  },
-  {
-    hash: '1234abcd5678ef901234abcd5678ef901234abcd5678ef901234abcd5678ef90',
-    type: 'Native XLM',
-    amount: '15.5000 XLM',
-    destination: 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5',
-    timestamp: '2026-10-06 11:15:00 UTC',
-    status: 'Pending',
-    ledger: 104190,
-  },
-];
+import { TrackerTransaction, paymentApiService } from '../../services/payments';
 
 export function TransactionHistoryView() {
-  const [filter, setFilter] = useState<'All' | 'Success' | 'Pending' | 'Failed'>('All');
-  const [txs] = useState<TxItem[]>(INITIAL_TXS);
+  const [filter, setFilter] = useState<'All' | 'Contract Payment' | 'Native Payment' | 'Settlement' | 'Tip'>('All');
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Success' | 'Pending' | 'Failed'>('All');
+  const [txs, setTxs] = useState<TrackerTransaction[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const loadTransactions = async () => {
+    setIsLoading(true);
+    try {
+      const data = await paymentApiService.getTransactions();
+      setTxs(data);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadTransactions();
+  }, []);
 
   const filtered = txs.filter((tx) => {
-    if (filter === 'All') return true;
-    return tx.status === filter;
+    if (filter !== 'All' && tx.type !== filter) return false;
+    if (statusFilter !== 'All' && tx.status !== statusFilter) return false;
+    return true;
   });
 
   return (
@@ -64,14 +42,56 @@ export function TransactionHistoryView() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.35rem' }}>
+        <button
+          type="button"
+          className={`icon-btn ${isLoading ? 'spinning' : ''}`}
+          onClick={loadTransactions}
+          title="Refresh transaction ledger"
+          aria-label="Refresh transactions"
+          data-testid="refresh-txs-btn"
+        >
+          <RefreshCw size={15} />
+        </button>
+      </div>
+
+      {/* Filter Bar */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '0.75rem',
+          margin: '0.75rem 0',
+          paddingBottom: '0.75rem',
+          borderBottom: '1px solid var(--border-color)',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+            <Filter size={12} /> Type:
+          </span>
+          {(['All', 'Contract Payment', 'Native Payment', 'Settlement', 'Tip'] as const).map((t) => (
+            <button
+              key={t}
+              type="button"
+              className={`filter-tab-btn ${filter === t ? 'active' : ''}`}
+              style={{ fontSize: '0.75rem', padding: '0.2rem 0.55rem' }}
+              onClick={() => setFilter(t)}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
           {(['All', 'Success', 'Pending', 'Failed'] as const).map((s) => (
             <button
               key={s}
               type="button"
-              className={`filter-tab-btn ${filter === s ? 'active' : ''}`}
-              style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-              onClick={() => setFilter(s)}
+              className={`filter-tab-btn ${statusFilter === s ? 'active' : ''}`}
+              style={{ fontSize: '0.75rem', padding: '0.2rem 0.55rem' }}
+              onClick={() => setStatusFilter(s)}
             >
               {s}
             </button>
@@ -79,65 +99,81 @@ export function TransactionHistoryView() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
-        {filtered.map((tx) => (
-          <div
-            key={tx.hash}
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              padding: '0.85rem 1rem',
-              background: 'var(--bg-primary)',
-              borderRadius: 'var(--radius-md)',
-              border: '1px solid var(--border-color)',
-              flexWrap: 'wrap',
-              gap: '0.5rem',
-            }}
-          >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{tx.amount}</span>
-                <span
-                  style={{
-                    fontSize: '0.7rem',
-                    padding: '0.1rem 0.4rem',
-                    borderRadius: '4px',
-                    background: 'rgba(255,255,255,0.06)',
-                    color: 'var(--text-secondary)',
-                  }}
-                >
-                  {tx.type}
-                </span>
-                <span
-                  className={`status-badge status-${tx.status.toLowerCase()}`}
-                  style={{ fontSize: '0.7rem' }}
-                >
-                  {tx.status === 'Success' && <CheckCircle size={10} style={{ marginRight: '0.2rem' }} />}
-                  {tx.status === 'Pending' && <Clock size={10} style={{ marginRight: '0.2rem' }} />}
-                  {tx.status === 'Failed' && <XCircle size={10} style={{ marginRight: '0.2rem' }} />}
-                  {tx.status}
-                </span>
-              </div>
-              <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                To: <span className="mono-text">{tx.destination.substring(0, 10)}...{tx.destination.slice(-6)}</span> • Ledger: {tx.ledger}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{tx.timestamp}</span>
-              <a
-                href={`${STELLAR_CONFIG.explorerTxUrl}/${tx.hash}`}
-                target="_blank"
-                rel="noreferrer"
-                className="btn btn-secondary btn-sm"
-                style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
-              >
-                Explorer <ExternalLink size={12} style={{ marginLeft: '0.25rem' }} />
-              </a>
-            </div>
+      {/* Transactions List */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '0.5rem' }}>
+        {isLoading && txs.length === 0 ? (
+          <div className="empty-state">
+            <RefreshCw size={24} className="animate-spin text-muted" />
+            <span className="text-muted text-sm">Loading transactions...</span>
           </div>
-        ))}
+        ) : filtered.length === 0 ? (
+          <div className="empty-state">
+            <Clock size={24} className="text-muted" />
+            <span className="text-muted text-sm">No transactions match your criteria.</span>
+          </div>
+        ) : (
+          filtered.map((tx) => (
+            <div
+              key={tx.id || tx.hash}
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '0.85rem 1rem',
+                background: 'var(--bg-primary)',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid var(--border-color)',
+                flexWrap: 'wrap',
+                gap: '0.5rem',
+              }}
+              data-testid={`tx-row-${tx.hash.substring(0, 8)}`}
+            >
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{tx.amount}</span>
+                  <span
+                    style={{
+                      fontSize: '0.7rem',
+                      padding: '0.1rem 0.45rem',
+                      borderRadius: '4px',
+                      background: 'rgba(255,255,255,0.06)',
+                      color: 'var(--text-secondary)',
+                    }}
+                  >
+                    {tx.type}
+                  </span>
+                  <span
+                    className={`status-badge status-${tx.status.toLowerCase()}`}
+                    style={{ fontSize: '0.7rem' }}
+                  >
+                    {tx.status === 'Success' && <CheckCircle size={10} style={{ marginRight: '0.2rem' }} />}
+                    {tx.status === 'Pending' && <Clock size={10} style={{ marginRight: '0.2rem' }} />}
+                    {tx.status === 'Failed' && <XCircle size={10} style={{ marginRight: '0.2rem' }} />}
+                    {tx.status}
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                  To: <span className="mono-text">{tx.destination.substring(0, 10)}...{tx.destination.slice(-6)}</span> • Ledger: {tx.ledger}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  {new Date(tx.created_at).toLocaleString()}
+                </span>
+                <a
+                  href={`${STELLAR_CONFIG.explorerTxUrl}/${tx.hash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn btn-secondary btn-sm"
+                  style={{ fontSize: '0.75rem', padding: '0.25rem 0.6rem' }}
+                >
+                  Explorer <ExternalLink size={12} style={{ marginLeft: '0.25rem' }} />
+                </a>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );
