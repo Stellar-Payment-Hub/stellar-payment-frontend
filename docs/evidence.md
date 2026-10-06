@@ -1,112 +1,101 @@
-# Level 1 Submission Evidence & Verification Dossier
+# Level 2: Yellow Belt Submission Evidence & Verification Dossier
 
-This document provides complete verification evidence for **Level 1: White Belt** of the **Stellar Payment Hub**.
+This document provides complete verification evidence for **Level 2: Yellow Belt** of the **Stellar Payment Hub**.
 
 ---
 
-## 1. Disconnected Wallet / Landing Page
-* **State**: Initial page load before wallet connection.
-* **UI Elements**:
-  * Brand Header: "Stellar Payment Hub" with Level 1 badge.
-  * Network Indicator: `● STELLAR TESTNET`
-  * Wallet Indicator: `Disconnected` badge.
-  * Primary Action: `Connect Wallet` button with Freighter icon.
-  * Informational Cards: Balance in pending connection state and Testnet guide rules.
+## 1. Multiple Wallet Options
+* **Interface**: Multi-Wallet selection modal (`WalletSelectModal`).
+* **Supported Adapters**:
+  1. **Freighter** (Stellar browser extension)
+  2. **Albedo** (Universal web-based authentication)
+  3. **xBull** (Multi-platform desktop/browser wallet)
+* **Error Handling**: Distinct handling for `Wallet Not Found`, `User Rejected`, and `Network Mismatch`.
 
 ```text
-┌────────────────────────────────────────────────────────────────────────┐
-│ ⚡ Stellar Payment Hub  [Level 1]        ● STELLAR TESTNET  [Disconnected] │
-│ Non-custodial Testnet Settlement Platform              [Connect Wallet]│
-├────────────────────────────────────┬───────────────────────────────────┤
-│ Available Balance                  │ Send XLM                          │
-│ -- XLM                             │ Instant peer-to-peer payment      │
-│ (Connect Freighter wallet)         │ Recipient: [ G... ]               │
-│                                    │ Amount:    [ 0.00 XLM ]           │
-│ Testnet Guidelines                 │ Memo:      [ Optional ]           │
-│ - Connect Freighter on Testnet     │ [ Review Payment ] (Disabled)     │
-│ - 1.0 XLM ledger base reserve      │                                   │
-│ - Free testnet funding             │ Recent Activity                   │
-│                                    │ No transactions yet in session    │
-└────────────────────────────────────┴───────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│  Connect Wallet                              │
+│  Select a Stellar wallet for Testnet:        │
+│                                              │
+│  [ Freighter ] Browser extension             │
+│  [ Albedo    ] Web popup authentication      │
+│  [ xBull     ] Multi-platform wallet         │
+└──────────────────────────────────────────────┘
 ```
 
 ---
 
-## 2. Freighter Connected
-* **State**: User clicks "Connect Wallet" and grants permission in Freighter.
-* **UI Elements**:
-  * Status badge switches to `Connected` with green dot.
-  * Truncated address chip displayed in header (`GBBD47IF...FLA5`).
-  * One-click copy address button with copied tooltip.
-  * Direct shortcut link to view account on Stellar Expert Testnet.
-  * `Disconnect` button becomes active.
+## 2. Connected Wallet & Navigation
+* **State**: Active wallet badge displayed (`FREIGHTER` / `ALBEDO` / `XBULL`), truncated public address chip, one-click copy, and disconnect button.
+* **Navigation Tabs**:
+  * `[ Dashboard ]`: Balance, direct transfers, programmable payments overview.
+  * `[ Payment Tracker ]`: Full tracked payment lifecycle and audit trail.
+  * `[ New Tracked Payment ]`: Soroban contract invocation form.
 
 ---
 
-## 3. Wallet Address & Live XLM Balance
-* **State**: Account hydrated from `https://horizon-testnet.stellar.org/accounts/{publicKey}`.
-* **UI Elements**:
-  * Live balance rendered: `10,000.0000 XLM`.
-  * Spendable balance calculated: `9,999.0000 XLM` (accounting for the 1.0 XLM Stellar base reserve).
-  * Refresh button with rotational spinning animation during sync.
-  * Testnet faucet helper: "Fund with Friendbot (+10,000 XLM)" available if account is new/unfunded.
+## 3. XLM Balance Retrieval & Faucet
+* **State**: Real Testnet balance hydrated from `https://horizon-testnet.stellar.org`.
+* **Spendable Calculations**: Deducts base reserve (1.0 XLM) and subentries.
+* **Friendbot Faucet**: In-app grant button (+10,000 Testnet XLM) for newly generated accounts.
 
 ---
 
-## 4. Payment Form Before Submission
-* **State**: User enters transaction parameters.
-* **Validation Active**:
-  * Recipient: `GD6W...3K21` (Validated 56-character Ed25519 public key via `StrKey.isValidEd25519PublicKey`).
-  * Amount: `25.00 XLM` (Verified > 0, within spendable balance, max 7 decimals).
-  * Max button: autofills spendable balance.
-  * Memo: `Invoice #1042` (Character length counter shows 14/28 UTF-8 bytes).
-  * Primary Action: `Review Payment` button is enabled.
+## 4. Tracked Payment Creation
+* **Component**: `CreateTrackedPaymentForm`.
+* **Fields**: Recipient address (validated Ed25519), Amount (XLM), Memo / Reference note.
+* **Pre-flight Validation**: Checks for valid 56-char public key, positive non-zero amount, stroop precision, and UTF-8 memo limit.
 
 ---
 
-## 5. Wallet Approval & Transaction Progress
-* **State**: Pre-flight review modal and Freighter signing pipeline.
-* **Lifecycle Flow**:
-  1. `Preparing`: Fetches current account sequence and base fee from Horizon.
-  2. `Awaiting Signature`: Freighter extension opens asking user to approve transaction XDR.
-  3. `Submitting`: Broadcasting signed XDR to Stellar Testnet Horizon.
-* **UI Feedback**: Animated progress spinner and contextual status text inside the modal.
+## 5. Soroban Contract Call
+* **Function Invoked**: `PaymentRegistry.create_payment(creator, recipient, amount, memo)`.
+* **Contract Address**: [`CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY`](https://stellar.expert/explorer/testnet/contract/CCBUEU4J4YXGSWURDMKUONPNGQ4ETBACWO5PC7IL5H4DVNYWJLYFETGY).
+* **Execution**: Transaction built using `@stellar/stellar-sdk` `invokeContractFunction`, signed with user wallet, and submitted to Horizon Testnet.
 
 ---
 
-## 6. Successful Testnet Transaction
-* **State**: Transaction committed to a Stellar Testnet ledger.
-* **UI Feedback**:
-  * Celebration confetti animation triggered via `canvas-confetti`.
-  * Success card with green checkmark banner.
-  * Amount & recipient confirmation: `25.00 XLM sent to recipient on Stellar Testnet`.
-  * Ledger close number: `Ledger Close: #104250`.
+## 6. Payment Tracker
+* **Component**: `PaymentTracker`.
+* **Features**:
+  * Tab filtering: `All`, `Pending`, `Processing`, `Completed`, `Failed`, `Cancelled`.
+  * Instant search filter: by ID (`PAY-001`), recipient, or creator.
+  * Payment Card: Shows reference ID, On-chain ID (`#1`), Amount in XLM, Recipient, and Status pill.
+
+```text
+┌────────────────────────────────────────────────────────┐
+│  Payment Tracker                 ● Live Sync [Refresh] │
+│  [All] [Pending] [Processing] [Completed] [Failed]     │
+│  [ Search by ID or address...                        ] │
+├────────────────────────────────────────────────────────┤
+│  PAY-001 (#1)   To: GA5ZSEJY...KZVN   25.00 XLM   🟡 PENDING     │
+│  PAY-002 (#2)   To: GCA3HNDW...X7R7   10.00 XLM   ✓ COMPLETED   │
+│  PAY-003 (#3)   To: GBBD47IF...FLA5   15.50 XLM   ● PROCESSING  │
+└────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 7. Transaction Hash & Stellar Explorer Verification
-* **State**: Real cryptographic transaction hash captured and displayed.
-* **UI Elements**:
-  * Hash Container: `3389e9f2f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889`
-  * One-click copy button with confirmation checkmark.
-  * Action button: `[View on Stellar Explorer ↗]` linking to:
-    `https://stellar.expert/explorer/testnet/tx/3389e9f2f1a65f19736cacf544c2e825313e8447f569233bb8db39aa607c8889`
-  * Action button: `[Send Another Payment]` resets form state.
+## 7. Payment Detail Modal & Audit Events
+* **Component**: `PaymentDetailModal`.
+* **Breakdown**: Displays full on-chain metadata, Creator, Recipient, Memo, Contract Address, Transaction Hash, and the timestamped timeline of lifecycle events (`PaymentCreated`, `PaymentUpdated`, `PaymentCompleted`).
 
 ---
 
-## 8. CI Workflow Passing Evidence
-* **All Three Workflows Passing on GitHub**:
-  * **Frontend CI**: Run `37453910551` &bull; **Success** (Lint, Typecheck, Test, Build)
-  * **Backend CI**: Run `37454031197` &bull; **Success** (Lint, Test, Build)
-  * **Contracts CI**: Run `37453885124` &bull; **Success** (Cargo Check, Cargo Test, WASM Build)
+## 8. Real-Time Status Updates via SSE
+* **Mechanism**: Server-Sent Events stream (`GET /api/payments/stream`).
+* **Behavior**: When an on-chain event or backend transaction occurs, the backend broadcasts `payment:updated`. Connected frontend clients update payment statuses immediately without requiring a full page refresh.
 
 ---
 
-## 9. Mobile Responsive View
-* **State**: Viewport width &le; 640px.
-* **Responsive Adaptations**:
-  * Header collapses into a vertical mobile layout maintaining brand identity and wallet chip.
-  * Grid transforms from two columns into a single fluid column.
-  * Input fields, review modal, and result cards scale cleanly with touch-friendly button targets (minimum 44px).
-  * Zero horizontal overflow.
+## 9. Transaction Hash & Stellar Explorer Verification
+* **Cryptographic Hash**: Rendered with copy-to-clipboard functionality and verified on Stellar Expert:
+  `https://stellar.expert/explorer/testnet/tx/{hash}`.
+
+---
+
+## 10. Automated Tests & CI Verification
+* **Frontend**: 32 unit and component tests passing (`validation`, `wallet`, `transaction-status`, `multi-wallet`, `payment-tracker`).
+* **Backend**: 7 API and event idempotency tests passing.
+* **Contracts**: 5 Soroban unit tests verifying create, read, state machine transitions, and error handling.
+* **GitHub Actions CI**: Automated pipelines passing on all three repositories.
