@@ -82,7 +82,7 @@ export async function signTransactionWithFreighter(
   try {
     const signRes = await freighter.signTransaction(xdr, {
       networkPassphrase: STELLAR_CONFIG.networkPassphrase,
-      accountToSign,
+      address: accountToSign,
     });
 
     if (!signRes) {

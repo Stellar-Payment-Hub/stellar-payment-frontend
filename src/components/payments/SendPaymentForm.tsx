@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Send, AlertCircle, Sparkles } from 'lucide-react';
+import { useState } from 'react';
+import { Send, AlertCircle } from 'lucide-react';
 import { PaymentFormData, PaymentFormErrors } from '../../types/payment';
 import { validatePaymentForm } from '../../lib/validation/payment';
 
