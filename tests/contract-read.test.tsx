@@ -11,7 +11,7 @@ describe('ContractReader Component (Section 16: Contract Read Operations)', () =
     expect(screen.getByTestId('contract-query-btn')).toBeInTheDocument();
   });
 
-  it('queries contract and displays on-chain payment record matching Level 2 specs', async () => {
+  it('queries contract and displays on-chain payment record', async () => {
     vi.spyOn(paymentRegistry, 'readContractPayment').mockResolvedValueOnce({
       id: 1,
       creator: 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5',

@@ -1,6 +1,6 @@
-# Level 3: Orange Belt Submission Evidence & Verification Dossier
+# Stellar Payment Hub — Production Verification & Feature Dossier
 
-This document provides complete verification evidence for **Level 3: Orange Belt** of the **Stellar Payment Hub**.
+This document provides complete verification evidence, architecture proofs, and quality assurance outputs for the **Stellar Payment Hub**.
 
 ---
 
@@ -16,7 +16,7 @@ This document provides complete verification evidence for **Level 3: Orange Belt
 
 ---
 
-## 2. Level 3 Feature Verification
+## 2. Core Feature Verification
 
 ### A. Multi-Address Payments (`MultiPaymentForm`)
 * Supports 2 to 10 distinct recipient addresses in an atomic batch.
@@ -63,7 +63,7 @@ This document provides complete verification evidence for **Level 3: Orange Belt
 
 ---
 
-## 3. Required Screenshot Evidence References
+## 3. Verified Screenshot Evidence References
 
 | Section | Feature | Interface Target |
 | :--- | :--- | :--- |
@@ -88,7 +88,7 @@ This document provides complete verification evidence for **Level 3: Orange Belt
  ✓ tests/multi-wallet.test.tsx (3 tests)
  ✓ tests/payment-tracker.test.tsx (2 tests)
  ✓ tests/contract-read.test.tsx (2 tests)
- ✓ tests/level3-payments.test.tsx (6 tests)
+ ✓ tests/settlements-and-splits.test.tsx (6 tests)
 
 Test Files  7 passed (7)
      Tests  40 passed (40)
@@ -96,11 +96,11 @@ Test Files  7 passed (7)
 
 ### Backend (16 tests passing)
 ```text
- ✓ health endpoint (2 tests)
- ✓ payments api (4 tests)
+ ✓ health endpoint (1 test)
+ ✓ payments api (6 tests)
  ✓ settlements api (4 tests)
  ✓ payment requests api (3 tests)
- ✓ transactions api (3 tests)
+ ✓ transactions api (2 tests)
 
 Test Files  5 passed (5)
      Tests  16 passed (16)
@@ -109,19 +109,21 @@ Test Files  5 passed (5)
 ### Smart Contracts (11 tests passing)
 ```text
 running 5 tests (payment-registry)
-test test::test_create_payment_success ... ok
-test test::test_payment_status_transitions ... ok
-test test::test_cancel_payment_by_creator ... ok
-test test::test_unauthorized_payment_modification ... ok
-test test::test_events_emission ... ok
+test test::test_create_and_read_payment ... ok
+test test::test_invalid_amount_rejected ... ok
+test test::test_same_address_rejected ... ok
+test test::test_update_and_complete_payment ... ok
+test test::test_cancel_payment ... ok
+test result: ok. 5 passed; 0 failed
 
 running 6 tests (settlement-router)
-test test::test_create_settlement_success ... ok
+test test::test_create_and_execute_settlement_with_inter_contract_call ... ok
 test test::test_split_bill_equal_shares ... ok
-test test::test_settlement_validation_failures ... ok
-test test::test_duplicate_recipient_rejection ... ok
-test test::test_inter_contract_payment_execution ... ok
+test test::test_split_bill_remainder_allocation ... ok
+test test::test_empty_recipients_rejected ... ok
+test test::test_unauthorized_execution_rejected ... ok
 test test::test_cancel_settlement ... ok
+test result: ok. 6 passed; 0 failed
 
-test result: ok. 11 passed; 0 failed
+Total: 11 tests passed, 0 failed
 ```

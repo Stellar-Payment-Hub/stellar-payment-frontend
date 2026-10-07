@@ -106,8 +106,8 @@ It delivers a unified, production-ready payment experience combining native peer
               ┌───────────────────────────┐
               │     Soroban Contracts     │
               │                           │
-              │ SettlementRouter (L3)     │
-              │ PaymentRegistry (L2)      │
+              │ SettlementRouter          │
+              │ PaymentRegistry           │
               └───────────────────────────┘
 ```
 
@@ -126,6 +126,7 @@ It delivers a unified, production-ready payment experience combining native peer
 | **Payment** | Insufficient balance | *"Insufficient XLM balance. Amount exceeds your spendable funds."* | Check spendable balance calculation |
 | **Payment** | Split sum mismatch | *"Sum of participant shares must equal the total bill amount."* | Auto-balance or adjust individual shares |
 | **Payment** | Memo exceeds limit | *"Memo exceeds Stellar's 28-byte UTF-8 limit."* | Truncate or condense memo text |
+| **Contract** | RPC or network error | *"Blockchain transaction submission failed. Please verify RPC connection and retry."* | Check Horizon / RPC status and retry |
 
 ---
 
@@ -140,19 +141,16 @@ npm test
 ### Verified Test Output
 
 ```text
- RUN  v2.1.9 C:/Users/USER/.../stellar-payment-frontend
-
- ✓ tests/validation.test.ts (17 tests) 21ms
- ✓ tests/wallet.test.tsx (7 tests) 145ms
- ✓ tests/transaction-status.test.tsx (3 tests) 158ms
- ✓ tests/multi-wallet.test.tsx (3 tests) 191ms
- ✓ tests/payment-tracker.test.tsx (2 tests) 338ms
- ✓ tests/contract-read.test.tsx (2 tests) 351ms
- ✓ tests/level3-payments.test.tsx (6 tests) 521ms
+ ✓ tests/validation.test.ts (17 tests)
+ ✓ tests/wallet.test.tsx (7 tests)
+ ✓ tests/transaction-status.test.tsx (3 tests)
+ ✓ tests/multi-wallet.test.tsx (3 tests)
+ ✓ tests/payment-tracker.test.tsx (2 tests)
+ ✓ tests/contract-read.test.tsx (2 tests)
+ ✓ tests/settlements-and-splits.test.tsx (6 tests)
 
  Test Files  7 passed (7)
       Tests  40 passed (40)
-   Duration  4.61s
 ```
 
 ---

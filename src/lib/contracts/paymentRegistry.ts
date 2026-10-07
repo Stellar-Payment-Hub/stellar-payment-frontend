@@ -120,7 +120,7 @@ export async function invokeCreateContractPayment({
 
 /**
  * Read payment state directly from the Soroban PaymentRegistry contract (or indexer cache).
- * Implements Level 2 Section 16: CONTRACT READ OPERATIONS.
+ * Query contract storage and payment state machine.
  */
 export async function readContractPayment(
   paymentQuery: string | number

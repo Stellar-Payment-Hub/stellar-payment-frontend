@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Stellar Payment Hub - Level 1 frontend: Freighter wallet, XLM balance, Stellar Testnet payments",
+  "description": "Enterprise-grade decentralized payment platform on Stellar & Soroban",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

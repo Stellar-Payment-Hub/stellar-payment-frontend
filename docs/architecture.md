@@ -1,40 +1,54 @@
-# Stellar Payment Hub - Architecture & Design
+# Stellar Payment Hub — Frontend Architecture & Design
 
 ## System Architecture Overview
 
-Stellar Payment Hub is structured across three polyrepos:
-* **`stellar-payment-frontend`** (This repository): Non-custodial dApp client powering the core user loop, Freighter wallet authentication, balance inquiry, and Stellar payment dispatch.
-* **`stellar-payment-backend`**: Foundation Node.js service establishing health checks, future transaction indexing, and real-time payment tracking.
-* **`stellar-payment-contracts`**: Soroban smart contract workspace hosting the `payment-registry` scaffold for on-chain audit trails in Level 2.
+Stellar Payment Hub is structured across three cohesive repositories:
+* **`stellar-payment-frontend`** (This repository): Production React 18 & TypeScript dApp client powering multi-wallet authentication, real-time balance hydration, atomic batch disbursements, bill splitting, and live push synchronization.
+* **`stellar-payment-backend`**: High-performance Express API and event processor providing idempotent Soroban event indexing, transaction ledger aggregation, rate-limiting, and real-time SSE streams.
+* **`stellar-payment-contracts`**: Soroban smart contract suite featuring `SettlementRouter` with inter-contract dispatch and `PaymentRegistry` persistent lifecycle store.
 
+```text
+┌────────────────────────────────────────────────────────┐
+│                        FRONTEND                        │
+│                                                        │
+│  Dashboard │ Payments │ Multi-Pay │ Split │ Tip Jar    │
+│  Tracker 2.0 │ Transactions │ Faucet Developer         │
+└───────────────────────────┬────────────────────────────┘
+                            │
+               Wallet / API / SSE Stream
+                            │
+        ┌───────────────────┴───────────────────┐
+        ▼                                       ▼
+┌──────────────┐                       ┌─────────────────┐
+│ Stellar      │                       │ Backend API     │
+│ Wallets      │                       │ (REST / SSE)    │
+│ (Freighter,  │                       │ Event Processor │
+│ Albedo,      │                       │ PostgreSQL      │
+│ xBull)       │                       └────────┬────────┘
+└───────┬──────┘                                │
+        └───────────────────┬───────────────────┘
+                            ▼
+              ┌───────────────────────────┐
+              │      Stellar Testnet      │
+              │                           │
+              │ Native XLM Transfers      │
+              │ Soroban Contract Events   │
+              └─────────────┬─────────────┘
+                            ▼
+              ┌───────────────────────────┐
+              │     Soroban Contracts     │
+              │                           │
+              │ SettlementRouter          │
+              │ PaymentRegistry           │
+              └───────────────────────────┘
 ```
-+-------------------------------------------------------------+
-|                  Stellar Payment Hub (Frontend)             |
-|                                                             |
-|  +---------------------+        +------------------------+  |
-|  |   Freighter Wallet  |        |    Stellar SDK (V13)   |  |
-|  |      Integration    |        |   Transaction Builder  |  |
-|  +----------+----------+        +-----------+------------+  |
-+-------------|-------------------------------|---------------+
-              | Request Access / Sign         | Submit TX
-              v                               v
-+-----------------------------+   +---------------------------+
-|      Freighter Extension    |   |  Stellar Testnet Horizon  |
-|     (Ed25519 Keypair)       |   | (horizon-testnet.stellar) |
-+-----------------------------+   +-------------+-------------+
-                                                |
-                                                v
-                                  +---------------------------+
-                                  |    Stellar Expert / RPC   |
-                                  |     Ledger Verification   |
-                                  +---------------------------+
-```
 
-## Level 1 Core Payment Loop
+---
 
-1. **Wallet Initialization**: Detects Freighter extension injection, checks connection status, and requests account public key.
-2. **Account Hydration**: Queries Stellar Horizon `/accounts/{publicKey}` to retrieve native balances and subentry count, calculating spendable XLM after minimum reserve requirements.
-3. **Form Validation**: Strict client-side checks for Ed25519 recipient formatting, positive non-zero balance limits, and 28-byte memo UTF-8 boundary.
-4. **Transaction Construction**: Loads sequence number, applies base network fee (100 stroops), appends native payment or create-account operation, and generates unsigned transaction XDR.
-5. **Freighter Signature**: Passes XDR to Freighter extension for user review and cryptographic signature.
-6. **Horizon Ingestion & Feedback**: Submits signed XDR to Testnet Horizon, captures real transaction hash, and displays direct links to Stellar Expert Explorer.
+## Core Payment & Settlement Workflows
+
+1. **Multi-Wallet Integration**: Supports Freighter, Albedo, and xBull extensions with automatic network validation preventing accidental Mainnet execution during Testnet operations.
+2. **Account Hydration & Reserve Safeguards**: Queries Stellar Horizon `/accounts/{publicKey}` to retrieve native balances and subentry count, calculating spendable XLM after minimum reserve requirements (`2 * base_reserve + subentries * base_reserve`).
+3. **Form & Arithmetic Validation**: Enforces StrKey Ed25519 checksum formatting, non-negative amounts, self-transfer rejection, and exact equality constraints for batch allocations (`sum(shares) == total`).
+4. **Transaction Construction & Signing**: Loads sequence numbers, applies network base fee, and signs payloads with user-approved wallet credentials.
+5. **Real-Time Push Synchronization**: Integrates persistent Server-Sent Events (SSE) via `/api/payments/stream` to update UI payment statuses immediately upon on-chain ledger confirmation without polling.

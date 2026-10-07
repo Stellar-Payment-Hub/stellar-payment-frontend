@@ -319,7 +319,7 @@ class PaymentApiService {
     return created;
   }
 
-  // --- Settlements (Level 3) ---
+  // --- Settlements ---
   public async getSettlements(): Promise<TrackerSettlement[]> {
     try {
       const res = await fetch(`${STELLAR_CONFIG.backendUrl}/api/settlements`, {
@@ -390,7 +390,7 @@ class PaymentApiService {
     return newSettle;
   }
 
-  // --- Payment Requests (Level 3) ---
+  // --- Payment Requests ---
   public async getPaymentRequests(): Promise<TrackerPaymentRequest[]> {
     return this.localRequests;
   }
@@ -467,7 +467,7 @@ class PaymentApiService {
     return false;
   }
 
-  // --- Transactions (Level 3) ---
+  // --- Transactions ---
   public async getTransactions(): Promise<TrackerTransaction[]> {
     try {
       const res = await fetch(`${STELLAR_CONFIG.backendUrl}/api/transactions`, {
