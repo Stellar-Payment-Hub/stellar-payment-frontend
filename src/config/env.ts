@@ -1,6 +1,6 @@
 /**
  * Centralized Stellar Network Configuration.
- * Configured strictly for Stellar Testnet across Level 1, Level 2, and Level 3.
+ * Configured strictly for Stellar Testnet.
  */
 export const STELLAR_CONFIG = {
   network: import.meta.env.VITE_STELLAR_NETWORK || 'testnet',

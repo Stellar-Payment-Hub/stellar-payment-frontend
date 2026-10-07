@@ -5,7 +5,7 @@ import { SplitBillForm } from '../src/components/payments/SplitBillForm';
 import { TipJarView } from '../src/components/tipjar/TipJarView';
 import { PaymentTracker } from '../src/components/tracker/PaymentTracker';
 
-describe('Level 3 - Multi-Recipient & Split Payments', () => {
+describe('Multi-Recipient & Split Payments', () => {
   const SENDER = 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
   const RECIP_1 = 'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5';
 
