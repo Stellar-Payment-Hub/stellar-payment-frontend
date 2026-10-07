@@ -21,6 +21,66 @@ It delivers a unified, production-ready payment experience combining native peer
 
 ---
 
+## 📸 Product Walkthrough & Interface Tour
+
+Experience the core user flows and production capabilities of the Stellar Payment Hub:
+
+### 1. Enterprise Settlement Dashboard & Telemetry
+Real-time Stellar Horizon balance tracking, spendable balance calculation (with reserve protection), network telemetry, and quick-action navigation.
+
+![Enterprise Settlement Dashboard](docs/screenshots/01_dashboard_telemetry.png)
+
+---
+
+### 2. Multi-Wallet Authentication & Network Guard
+Seamless non-custodial onboarding supporting Freighter, Albedo, and xBull with proactive Testnet network guard enforcement.
+
+![Wallet Selection Modal](docs/screenshots/02_wallet_selection.png)
+
+---
+
+### 3. Atomic Multi-Address Settlement Builder
+Batch disbursements across 2 to 10 recipient accounts in a single atomic operation with live mathematical balance verification and custom settlement memos.
+
+![Multi-Address Settlement Builder](docs/screenshots/03_multi_address_settlement.png)
+
+---
+
+### 4. Remainder-Safe Split Bill Engine
+Precision expense sharing with automated remainder stroop allocation to eliminate rounding discrepancies, supporting equal and custom weighting.
+
+![Split Bill Engine](docs/screenshots/04_split_bill_engine.png)
+
+---
+
+### 5. Shareable Invoices & Payment Requests
+Create and track cryptographically verifiable payment requests with shareable deep links, custom expiration windows, and instant counterparty fulfillment.
+
+![Invoices & Payment Requests](docs/screenshots/05_invoices_payment_requests.png)
+
+---
+
+### 6. Payment Tracker 2.0 & Nested Recipient Tree
+Live SSE event synchronization with on-chain settlement inspection. Shows the hierarchical recipient payment breakdown (`SETTLE-001` → `PAY-SUB-1`, `PAY-SUB-2`, `PAY-SUB-3`) and verified Soroban inter-contract call status.
+
+![Payment Tracker & Recipient Tree](docs/screenshots/06_payment_tracker_tree.png)
+
+---
+
+### 7. Creator Tip Jar & Dynamic QR Portal
+Public micropayment portal with preset denominations, custom tip amounts, dynamic QR code generation, and immediate Stellar Expert verification.
+
+![Creator Tip Jar](docs/screenshots/07_creator_tip_jar.png)
+
+---
+
+### 8. Verifiable On-Chain Transaction Ledger
+Immutable historical record of native XLM payments, contract invocations, settlements, and tips with direct explorer inspection links.
+
+![Transaction Ledger](docs/screenshots/08_transaction_ledger.png)
+
+---
+
 ## Core Features & Workflows
 
 ### 1. Dashboard & Quick Actions
