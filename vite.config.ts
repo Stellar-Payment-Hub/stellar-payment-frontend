@@ -10,6 +10,18 @@ export default defineConfig({
     port: 3000,
     open: true,
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-stellar': ['@stellar/stellar-sdk', '@stellar/freighter-api'],
+          'vendor-ui': ['lucide-react', 'canvas-confetti'],
+        },
+      },
+    },
+    chunkSizeWarningLimit: 700,
+  },
   // @ts-expect-error vitest configuration
   test: {
     globals: true,
