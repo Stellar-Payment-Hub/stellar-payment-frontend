@@ -15,6 +15,7 @@ export const SettlementDetailModal = ({
   onClose,
 }: SettlementDetailModalProps) => {
   const [copiedHash, setCopiedHash] = useState(false);
+  const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   if (!isOpen) return null;
 
@@ -24,6 +25,16 @@ export const SettlementDetailModal = ({
       await navigator.clipboard.writeText(settlement.transaction_hash);
       setCopiedHash(true);
       setTimeout(() => setCopiedHash(false), 2000);
+    } catch {
+      //
+    }
+  };
+
+  const handleCopyRecipient = async (address: string, idx: number) => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopiedIndex(idx);
+      setTimeout(() => setCopiedIndex(null), 2000);
     } catch {
       //
     }
@@ -152,109 +163,64 @@ export const SettlementDetailModal = ({
                 </div>
               </div>
             )}
-
-            <div className="review-meta-item">
-              <span className="meta-label">Created At</span>
-              <span className="meta-value text-muted text-xs">
-                {new Date(settlement.created_at).toLocaleString()}
-              </span>
-            </div>
           </div>
 
-          {/* Nested Recipient Breakdown Tree (Section 15) */}
-          <div className="events-timeline mt-4">
-            <div className="events-timeline-header">
-              <Users size={14} className="text-cyan-400" />
-              <span className="text-xs font-semibold text-secondary uppercase tracking-wider">
-                Settlement Recipient Tree ({settlement.recipients.length})
+          {/* Individual Recipient Breakdown with Stroop Breakdown */}
+          <div className="recipient-breakdown-section mt-4">
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <span className="meta-label">Disbursement Allocation & Stroop Calculation</span>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                1 XLM = 10,000,000 Stroops
               </span>
             </div>
 
-            <div
-              style={{
-                fontFamily: 'monospace',
-                fontSize: '0.8rem',
-                background: 'var(--bg-primary)',
-                padding: '0.75rem 1rem',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid var(--border-color)',
-                marginTop: '0.5rem',
-              }}
-            >
-              <div style={{ color: 'var(--text-primary)', fontWeight: 600, marginBottom: '0.4rem' }}>
-                Settlement #{settlement.on_chain_id} [{settlement.total_amount} XLM]
-              </div>
-              {settlement.recipients.map((rec, index) => {
-                const isLast = index === settlement.recipients.length - 1;
-                const prefix = isLast ? '└── ' : '├── ';
+            <div className="recipient-breakdown-list">
+              {settlement.recipients.map((recip, idx) => {
+                const stroops = Math.round(parseFloat(recip.amount) * 10_000_000);
                 return (
-                  <div
-                    key={rec.id}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      padding: '0.35rem 0',
-                      borderBottom: isLast ? 'none' : '1px dashed rgba(255,255,255,0.05)',
-                    }}
-                  >
-                    <div>
-                      <span style={{ color: 'var(--text-muted)' }}>{prefix}</span>
+                  <div key={idx} className="recipient-breakdown-row" data-testid={`recipient-row-${idx}`}>
+                    <div className="recipient-row-info">
+                      <span className="recipient-index">#{idx + 1}</span>
                       <a
-                        href={getExplorerAccountUrl(rec.recipient)}
+                        href={getExplorerAccountUrl(recip.recipient)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: 'var(--cyan-400)', textDecoration: 'none' }}
+                        className="mono-text link-inline text-xs"
                       >
-                        {truncateHash(rec.recipient, 5, 5)}
+                        {truncateHash(recip.recipient, 6, 6)}
                       </a>
-                      {rec.sub_payment_id && (
-                        <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', marginLeft: '0.5rem' }}>
-                          ({rec.sub_payment_id})
-                        </span>
-                      )}
+                      <button
+                        type="button"
+                        className="icon-btn"
+                        style={{ width: '18px', height: '18px' }}
+                        onClick={() => handleCopyRecipient(recip.recipient, idx)}
+                        title="Copy recipient address"
+                      >
+                        {copiedIndex === idx ? <Check size={11} className="text-emerald-400" /> : <Copy size={11} />}
+                      </button>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                      <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
-                        {rec.amount} XLM
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <div style={{ textAlign: 'right' }}>
+                        <span className="recipient-amount mono-text font-bold">
+                          {recip.amount} <span className="text-cyan-400 text-xs">XLM</span>
+                        </span>
+                        <span
+                          style={{ fontSize: '0.65rem', color: 'var(--text-muted)', display: 'block' }}
+                          data-testid={`recipient-stroop-share-${idx}`}
+                        >
+                          {stroops.toLocaleString()} Stroops
+                        </span>
+                      </div>
+                      <span className="badge badge-success" style={{ fontSize: '0.65rem' }}>
+                        Disbursed
                       </span>
-                      {rec.status === 'COMPLETED' ? (
-                        <span className="badge badge-success" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>
-                          Completed
-                        </span>
-                      ) : rec.status === 'FAILED' ? (
-                        <span className="badge badge-danger" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>
-                          Failed
-                        </span>
-                      ) : (
-                        <span className="badge badge-warning" style={{ fontSize: '0.65rem', padding: '0.1rem 0.4rem' }}>
-                          Pending
-                        </span>
-                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
           </div>
-        </div>
-
-        <div className="modal-footer">
-          {settlement.transaction_hash && (
-            <a
-              href={getExplorerTxUrl(settlement.transaction_hash)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn btn-outline btn-sm"
-            >
-              <span>Verify on Explorer</span>
-              <ExternalLink size={12} />
-            </a>
-          )}
-          <button type="button" className="btn btn-secondary btn-sm" onClick={onClose}>
-            Close
-          </button>
         </div>
       </div>
     </div>
