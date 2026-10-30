@@ -18,6 +18,10 @@ import { PaymentTracker } from './components/tracker/PaymentTracker';
 import { TransactionHistoryView } from './components/transactions/TransactionHistoryView';
 import { WalletDetailView } from './components/wallet/WalletDetailView';
 import { DeveloperTestnetView } from './components/developer/DeveloperTestnetView';
+import { ThemeToggle } from './components/ui/ThemeToggle';
+import { FriendbotFunder } from './components/wallet/FriendbotFunder';
+import { OfflineBanner } from './components/ui/OfflineBanner';
+import { NetworkMismatchBanner } from './components/wallet/NetworkMismatchBanner';
 import { PaymentFormData } from './types/payment';
 import {
   Zap,
@@ -96,6 +100,7 @@ export function App() {
 
   return (
     <div className="app-container">
+      <OfflineBanner />
       {/* App Header */}
       <header className="app-header">
         <div className="brand-section">
