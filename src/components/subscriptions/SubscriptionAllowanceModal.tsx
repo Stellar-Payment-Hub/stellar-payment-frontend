@@ -26,6 +26,17 @@ export const SubscriptionAllowanceModal: React.FC<AllowanceModalProps> = ({
         <p className="text-xs text-slate-500 mb-4">
           To enable automated recurring debits for <strong className="text-slate-800 dark:text-slate-200">{plan.name}</strong>, approve a spend cap for the subscription contract:
         </p>
+        <div className="mb-3">
+          <label className="text-xs text-slate-500 mb-1 block">Authorization Cycles (Months)</label>
+          <input
+            type="number"
+            min="1"
+            max="36"
+            value={capMonths}
+            onChange={(e) => setCapMonths(parseInt(e.target.value, 10) || 1)}
+            className="w-full px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono text-xs outline-none"
+          />
+        </div>
         <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 mb-4 space-y-2">
           <div className="flex justify-between text-xs font-mono">
             <span className="text-slate-500">Rate per {plan.cadence}:</span>

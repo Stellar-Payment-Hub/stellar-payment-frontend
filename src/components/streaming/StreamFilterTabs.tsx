@@ -1,5 +1,4 @@
 import React from 'react';
-import { StreamStatus } from '../../types/stream';
 
 interface FilterTabsProps {
   activeTab: string;

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { SubscriptionPlan, UserSubscription, BillingInvoiceRecord } from '../../types/subscription';
+import { SubscriptionPlan, UserSubscription } from '../../types/subscription';
 import { MerchantMrrMetrics } from './MerchantMrrMetrics';
 import { SubscriptionPlanBuilder } from './SubscriptionPlanBuilder';
-import { SubscriptionAllowanceModal } from './SubscriptionAllowanceModal';
 import { CancelSubscriptionModal } from './CancelSubscriptionModal';
 import { PauseSubscriptionModal } from './PauseSubscriptionModal';
 import { SubscriptionTierBadge } from './SubscriptionTierBadge';
@@ -95,14 +94,23 @@ export const MerchantSubscriptionPortal: React.FC = () => {
         isOpen={!!selectedSubForCancel}
         onClose={() => setSelectedSubForCancel(null)}
         subscription={selectedSubForCancel}
-        onConfirmCancel={() => {}}
+        onConfirmCancel={(id) => {
+          setSubscriptions((prev) => prev.filter((s) => s.id !== id));
+        }}
       />
       <PauseSubscriptionModal
         isOpen={!!selectedSubForPause}
         onClose={() => setSelectedSubForPause(null)}
         subscription={selectedSubForPause}
-        onTogglePause={() => {}}
+        onTogglePause={(id, willPause) => {
+          setSubscriptions((prev) =>
+            prev.map((s) => (s.id === id ? { ...s, status: willPause ? 'paused' : 'active' } : s))
+          );
+        }}
       />
+      {subscriptions.length > 0 && (
+        <div className="text-xs text-slate-400">Total active managed subscriptions: {subscriptions.length}</div>
+      )}
     </div>
   );
 };

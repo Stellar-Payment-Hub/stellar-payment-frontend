@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AnalyticsEngine } from '../src/lib/analytics/analytics-engine';
 import { CsvLedgerExporter } from '../src/lib/analytics/csv-ledger-exporter';

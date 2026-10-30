@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { StreamMath } from '../src/lib/streaming/stream-math';
 import { CsvPayrollParser } from '../src/lib/streaming/csv-payroll';

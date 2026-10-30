@@ -20,7 +20,7 @@ export class FxRateEngine {
     return 1.0;
   }
 
-  static generateQuote(from: CurrencyCode, to: CurrencyCode, sourceAmount: number): CurrencyQuote {
+  static generateQuote(from: CurrencyCode, to: CurrencyCode, _sourceAmount: number): CurrencyQuote {
     const rate = this.getRate(from, to);
     const stellarFeeUsd = 0.00001;
     const bankFeeUsd = 45.0; // Typical wire transfer cost

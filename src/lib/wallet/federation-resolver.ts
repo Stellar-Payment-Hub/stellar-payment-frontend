@@ -16,7 +16,7 @@ export class FederationResolver {
     return {
       accountId: `G${user.toUpperCase()}STELLARFEDERATIONADDRESS77777777777777777777777777777777`,
       memoType: 'text',
-      memo: `fed:${user}`,
+      memo: `fed:${user}@${domain}`,
     };
   }
 }

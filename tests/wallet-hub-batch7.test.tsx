@@ -1,5 +1,4 @@
 import { describe, it, expect, vi } from 'vitest';
-import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MultiWalletModal } from '../src/components/wallet/MultiWalletModal';
 import { NetworkSelector } from '../src/components/wallet/NetworkSelector';

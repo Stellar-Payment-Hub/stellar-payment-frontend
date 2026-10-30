@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { SupportedWalletProvider, WalletSessionState } from '../types/wallet-hub';
 import { WalletSessionManager } from '../lib/wallet/wallet-session';
 

@@ -20,13 +20,23 @@ export const MerchantDebitTrigger: React.FC<DebitTriggerProps> = ({
         <div className="text-sm font-bold text-slate-900 dark:text-white">Automated Epoch Debiting</div>
         <div className="text-xs text-slate-500">{overdueCount} subscriptions ready for epoch debit invocation</div>
       </div>
-      <button
-        onClick={onBatchCharge}
-        disabled={overdueCount === 0}
-        className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold text-xs transition-colors"
-      >
-        Invoke Batch Debit
-      </button>
+      <div className="flex gap-2">
+        {subscriptions[0] && (
+          <button
+            onClick={() => onTriggerCharge(subscriptions[0].id)}
+            className="px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-700 text-xs font-semibold"
+          >
+            Trigger Single
+          </button>
+        )}
+        <button
+          onClick={onBatchCharge}
+          disabled={overdueCount === 0}
+          className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-bold text-xs transition-colors"
+        >
+          Invoke Batch Debit
+        </button>
+      </div>
     </div>
   );
 };

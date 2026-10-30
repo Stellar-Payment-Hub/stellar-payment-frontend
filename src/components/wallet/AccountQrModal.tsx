@@ -18,7 +18,14 @@ export const AccountQrModal: React.FC<AccountQrModalProps> = ({ isOpen, onClose,
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" data-testid="account-qr-modal">
-      <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center">
+      <div className="w-full max-w-sm rounded-2xl bg-white dark:bg-slate-900 p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 font-bold"
+          aria-label="Close"
+        >
+          ✕
+        </button>
         <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Account QR Code</h3>
         <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-xl inline-block mb-4 border border-slate-200 dark:border-slate-700">
           <div className="w-44 h-44 bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-mono text-slate-500">
