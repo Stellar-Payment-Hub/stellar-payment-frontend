@@ -7,29 +7,30 @@ on:
     branches: [main]
 
 jobs:
-  ci:
-    name: Lint, Test & Build Frontend
+  frontend-ci:
+    name: Test, Lint & Build Frontend
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: 'npm'
-          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Typecheck / Lint
-        run: npm run lint
+      - name: TypeScript Check
+        run: npx tsc -b
 
-      - name: Run Test Suite
+      - name: Run Vitest Unit Tests
         run: npm test
 
-      - name: Build Production Bundle
+      - name: Build Production Vite Assets
         run: npm run build
