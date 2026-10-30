@@ -19,9 +19,9 @@ import { TransactionHistoryView } from './components/transactions/TransactionHis
 import { WalletDetailView } from './components/wallet/WalletDetailView';
 import { DeveloperTestnetView } from './components/developer/DeveloperTestnetView';
 import { ThemeToggle } from './components/ui/ThemeToggle';
-import { FriendbotFunder } from './components/wallet/FriendbotFunder';
 import { OfflineBanner } from './components/ui/OfflineBanner';
 import { NetworkMismatchBanner } from './components/wallet/NetworkMismatchBanner';
+import { LowBalanceWarning } from './components/wallet/LowBalanceWarning';
 import { PaymentFormData } from './types/payment';
 import {
   Zap,
@@ -101,6 +101,8 @@ export function App() {
   return (
     <div className="app-container">
       <OfflineBanner />
+      <NetworkMismatchBanner currentNetwork={network} />
+      {address && <LowBalanceWarning balance={balanceState.spendableBalance || '0'} />}
       {/* App Header */}
       <header className="app-header">
         <div className="brand-section">
@@ -122,6 +124,7 @@ export function App() {
         </div>
 
         <div className="header-actions">
+          <ThemeToggle />
           <WalletStatus
             status={walletStatus}
             network={network}
