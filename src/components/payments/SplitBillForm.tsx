@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Divide, Plus, Trash2, AlertCircle, CheckCircle2, Loader2, Calculator } from 'lucide-react';
+import { Divide, Plus, Trash2, AlertCircle, CheckCircle2, Loader2, Percent } from 'lucide-react';
 import { isValidAddress } from '../../lib/validation/payment';
 import { paymentApiService } from '../../services/payments';
 import { WalletType } from '../../types/wallet';
@@ -7,6 +7,7 @@ import { WalletType } from '../../types/wallet';
 interface SplitRecipient {
   address: string;
   share: string;
+  percentage?: string;
 }
 
 interface SplitBillFormProps {
@@ -23,11 +24,11 @@ export function SplitBillForm({
   onSuccess,
   onSplitSuccess,
 }: SplitBillFormProps) {
-  const [mode, setMode] = useState<'equal' | 'custom'>('equal');
+  const [mode, setMode] = useState<'equal' | 'custom' | 'percentage'>('equal');
   const [totalBill, setTotalBill] = useState('120');
   const [recipients, setRecipients] = useState<SplitRecipient[]>([
-    { address: '', share: '60' },
-    { address: '', share: '60' },
+    { address: '', share: '60', percentage: '50' },
+    { address: '', share: '60', percentage: '50' },
   ]);
   const [memo, setMemo] = useState('Dinner Bill Split');
   const [loading, setLoading] = useState(false);
@@ -36,12 +37,37 @@ export function SplitBillForm({
 
   const parsedTotal = parseFloat(totalBill) || 0;
 
+  const recalculateFromPercentages = (newRecipients: SplitRecipient[], total: number) => {
+    return newRecipients.map((r) => {
+      const pct = parseFloat(r.percentage || '0') || 0;
+      const share = total > 0 ? ((total * pct) / 100).toFixed(4) : '0';
+      return { ...r, share };
+    });
+  };
+
   const handleTotalChange = (val: string) => {
     setTotalBill(val);
     const num = parseFloat(val);
-    if (!isNaN(num) && num > 0 && mode === 'equal') {
-      const perPerson = (num / recipients.length).toFixed(4);
-      setRecipients(recipients.map((r) => ({ ...r, share: perPerson })));
+    if (!isNaN(num) && num > 0) {
+      if (mode === 'equal') {
+        const perPerson = (num / recipients.length).toFixed(4);
+        setRecipients(recipients.map((r) => ({ ...r, share: perPerson })));
+      } else if (mode === 'percentage') {
+        setRecipients(recalculateFromPercentages(recipients, num));
+      }
+    }
+  };
+
+  const handleModeChange = (newMode: 'equal' | 'custom' | 'percentage') => {
+    setMode(newMode);
+    if (newMode === 'equal' && parsedTotal > 0) {
+      const perPerson = (parsedTotal / recipients.length).toFixed(4);
+      const equalPct = (100 / recipients.length).toFixed(2);
+      setRecipients(recipients.map((r) => ({ ...r, share: perPerson, percentage: equalPct })));
+    } else if (newMode === 'percentage' && parsedTotal > 0) {
+      const equalPct = (100 / recipients.length).toFixed(2);
+      const updated = recipients.map((r) => ({ ...r, percentage: equalPct }));
+      setRecipients(recalculateFromPercentages(updated, parsedTotal));
     }
   };
 
@@ -50,9 +76,17 @@ export function SplitBillForm({
     const newCount = recipients.length + 1;
     if (mode === 'equal' && parsedTotal > 0) {
       const perPerson = (parsedTotal / newCount).toFixed(4);
-      setRecipients([...recipients.map((r) => ({ ...r, share: perPerson })), { address: '', share: perPerson }]);
+      const equalPct = (100 / newCount).toFixed(2);
+      setRecipients([
+        ...recipients.map((r) => ({ ...r, share: perPerson, percentage: equalPct })),
+        { address: '', share: perPerson, percentage: equalPct },
+      ]);
+    } else if (mode === 'percentage') {
+      const equalPct = (100 / newCount).toFixed(2);
+      const updated = [...recipients.map((r) => ({ ...r, percentage: equalPct })), { address: '', share: '0', percentage: equalPct }];
+      setRecipients(recalculateFromPercentages(updated, parsedTotal));
     } else {
-      setRecipients([...recipients, { address: '', share: '0' }]);
+      setRecipients([...recipients, { address: '', share: '0', percentage: '0' }]);
     }
   };
 
@@ -62,18 +96,27 @@ export function SplitBillForm({
     if (mode === 'equal' && parsedTotal > 0) {
       const perPerson = (parsedTotal / filtered.length).toFixed(4);
       setRecipients(filtered.map((r) => ({ ...r, share: perPerson })));
+    } else if (mode === 'percentage' && parsedTotal > 0) {
+      const equalPct = (100 / filtered.length).toFixed(2);
+      const updated = filtered.map((r) => ({ ...r, percentage: equalPct }));
+      setRecipients(recalculateFromPercentages(updated, parsedTotal));
     } else {
       setRecipients(filtered);
     }
   };
 
-  const handleUpdatePerson = (index: number, field: 'address' | 'share', value: string) => {
+  const handleUpdatePerson = (index: number, field: 'address' | 'share' | 'percentage', value: string) => {
     const updated = [...recipients];
     updated[index][field] = value;
+    if (field === 'percentage' && mode === 'percentage') {
+      const pct = parseFloat(value) || 0;
+      updated[index].share = parsedTotal > 0 ? ((parsedTotal * pct) / 100).toFixed(4) : '0';
+    }
     setRecipients(updated);
   };
 
   const sumShares = recipients.reduce((sum, r) => sum + (parseFloat(r.share) || 0), 0);
+  const sumPercentages = recipients.reduce((sum, r) => sum + (parseFloat(r.percentage || '0') || 0), 0);
   const difference = parsedTotal - sumShares;
 
   const validate = (): string | null => {
@@ -88,7 +131,13 @@ export function SplitBillForm({
       if (isNaN(s) || s <= 0) return `Person #${i + 1} share must be greater than 0 XLM.`;
     }
 
-    if (Math.abs(difference) > 0.001) {
+    if (mode === 'percentage') {
+      if (Math.abs(sumPercentages - 100) > 0.5) {
+        return `Total percentage must equal 100% (currently ${sumPercentages.toFixed(1)}%).`;
+      }
+    }
+
+    if (Math.abs(difference) > 0.01) {
       return `Sum of shares (${sumShares.toFixed(4)} XLM) must equal the total bill (${parsedTotal.toFixed(4)} XLM).`;
     }
 
@@ -155,32 +204,34 @@ export function SplitBillForm({
           </div>
           <div>
             <h3 className="card-title">Split Bill Calculator</h3>
-            <p className="card-subtitle">Equal & Custom Bill Distribution</p>
+            <p className="card-subtitle">Equal, Percentage & Custom Bill Distribution</p>
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '0.4rem' }}>
+        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
           <button
             type="button"
             className={`btn ${mode === 'equal' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
             data-testid="split-mode-equal"
-            onClick={() => {
-              setMode('equal');
-              if (parsedTotal > 0) {
-                const perPerson = (parsedTotal / recipients.length).toFixed(4);
-                setRecipients(recipients.map((r) => ({ ...r, share: perPerson })));
-              }
-            }}
+            onClick={() => handleModeChange('equal')}
           >
-            Equal Split
+            Equal
+          </button>
+          <button
+            type="button"
+            className={`btn ${mode === 'percentage' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
+            data-testid="split-mode-percentage"
+            onClick={() => handleModeChange('percentage')}
+          >
+            <Percent size={13} style={{ marginRight: '2px' }} /> Percentage
           </button>
           <button
             type="button"
             className={`btn ${mode === 'custom' ? 'btn-primary' : 'btn-secondary'} btn-sm`}
             data-testid="split-mode-custom"
-            onClick={() => setMode('custom')}
+            onClick={() => handleModeChange('custom')}
           >
-            Custom Split
+            Custom
           </button>
         </div>
       </div>
@@ -201,16 +252,30 @@ export function SplitBillForm({
           />
         </div>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-            Participants ({recipients.length})
-          </label>
-          {recipients.map((r, index) => (
+        {/* Recipients list */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Participants ({recipients.length}/10)
+            </span>
+            {recipients.length < 10 && (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                data-testid="add-split-person-btn"
+                onClick={handleAddPerson}
+              >
+                <Plus size={14} /> Add Person
+              </button>
+            )}
+          </div>
+
+          {recipients.map((r, i) => (
             <div
-              key={index}
+              key={i}
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'minmax(0, 1fr) 110px 40px',
+                gridTemplateColumns: mode === 'percentage' ? '1fr 70px 100px 36px' : '1fr 110px 36px',
                 gap: '0.5rem',
                 alignItems: 'center',
               }}
@@ -218,71 +283,89 @@ export function SplitBillForm({
               <input
                 type="text"
                 className="input-field"
-                placeholder={`Participant #${index + 1} (G...)`}
+                placeholder={`Person #${i + 1} Address (G...)`}
                 value={r.address}
-                onChange={(e) => handleUpdatePerson(index, 'address', e.target.value)}
-                data-testid={`split-address-${index}`}
+                onChange={(e) => handleUpdatePerson(i, 'address', e.target.value)}
+                data-testid={`split-address-${i}`}
               />
+
+              {mode === 'percentage' && (
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="number"
+                    step="any"
+                    className="input-field"
+                    value={r.percentage || ''}
+                    onChange={(e) => handleUpdatePerson(i, 'percentage', e.target.value)}
+                    placeholder="%"
+                    data-testid={`split-pct-${i}`}
+                  />
+                  <span style={{ position: 'absolute', right: '8px', top: '50%', transform: 'translateY(-50%)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>%</span>
+                </div>
+              )}
+
               <input
                 type="number"
                 step="any"
                 className="input-field"
-                placeholder="Share"
                 value={r.share}
-                disabled={mode === 'equal'}
-                onChange={(e) => handleUpdatePerson(index, 'share', e.target.value)}
-                data-testid={`split-share-${index}`}
+                onChange={(e) => handleUpdatePerson(i, 'share', e.target.value)}
+                disabled={mode === 'equal' || mode === 'percentage'}
+                data-testid={`split-share-${i}`}
               />
-              <button
-                type="button"
-                className="btn btn-secondary btn-sm"
-                style={{ padding: '0.4rem', color: 'var(--color-error)' }}
-                onClick={() => handleRemovePerson(index)}
-                disabled={recipients.length <= 2}
-              >
-                <Trash2 size={14} />
-              </button>
+
+              {recipients.length > 2 && (
+                <button
+                  type="button"
+                  className="icon-btn"
+                  onClick={() => handleRemovePerson(i)}
+                  data-testid={`remove-split-person-${i}`}
+                  aria-label="Remove person"
+                >
+                  <Trash2 size={15} className="text-danger" />
+                </button>
+              )}
             </div>
           ))}
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button
-            type="button"
-            className="btn btn-secondary btn-sm"
-            onClick={handleAddPerson}
-            disabled={recipients.length >= 10}
-            data-testid="add-person-btn"
-          >
-            <Plus size={13} style={{ marginRight: '0.3rem' }} /> Add Person
-          </button>
-
-          <div style={{ textAlign: 'right', fontSize: '0.8rem' }}>
-            <div>Allocated: <strong style={{ color: 'var(--text-primary)' }}>{sumShares.toFixed(4)} XLM</strong></div>
-            <div style={{ color: Math.abs(difference) < 0.001 ? 'var(--color-success)' : 'var(--color-error)' }}>
-              {Math.abs(difference) < 0.001 ? '✓ Balanced' : `Difference: ${difference.toFixed(4)} XLM`}
-            </div>
-          </div>
+        {/* Remainder / Match Info */}
+        <div style={{ fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between', color: Math.abs(difference) > 0.01 ? 'var(--warning)' : 'var(--success)' }}>
+          <span>Allocated: {sumShares.toFixed(4)} / {parsedTotal.toFixed(4)} XLM</span>
+          <span>Difference: {difference >= 0 ? `+${difference.toFixed(4)}` : difference.toFixed(4)} XLM</span>
         </div>
 
-        <input
-          type="text"
-          className="input-field"
-          placeholder="Memo / Description (e.g. Saturday Dinner)"
-          value={memo}
-          onChange={(e) => setMemo(e.target.value)}
-        />
+        {mode === 'percentage' && (
+          <div style={{ fontSize: '0.75rem', display: 'flex', justifyContent: 'space-between', color: Math.abs(sumPercentages - 100) > 0.5 ? 'var(--danger)' : 'var(--success)' }}>
+            <span>Total Percentage: {sumPercentages.toFixed(1)}%</span>
+            <span>Target: 100%</span>
+          </div>
+        )}
+
+        <div>
+          <label style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'block', marginBottom: '0.25rem' }}>
+            Settlement Memo
+          </label>
+          <input
+            type="text"
+            className="input-field"
+            value={memo}
+            onChange={(e) => setMemo(e.target.value)}
+            placeholder="e.g. Dinner Bill Split"
+            data-testid="split-memo-input"
+          />
+        </div>
 
         {error && (
-          <div className="alert alert-error">
-            <AlertCircle size={16} />
+          <div className="alert alert-danger" data-testid="split-error-alert">
+            <AlertCircle size={15} style={{ flexShrink: 0 }} />
             <span>{error}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="alert alert-success">
-            <CheckCircle2 size={16} />
+          <div className="alert alert-success" data-testid="split-success-alert">
+            <CheckCircle2 size={15} style={{ flexShrink: 0 }} />
             <span>{successMsg}</span>
           </div>
         )}
@@ -295,14 +378,10 @@ export function SplitBillForm({
         >
           {loading ? (
             <>
-              <Loader2 size={16} className="spin" style={{ marginRight: '0.5rem' }} />
-              Executing Split Settlement...
+              <Loader2 size={16} className="animate-spin" /> Settling Split Bill...
             </>
           ) : (
-            <>
-              <Calculator size={15} style={{ marginRight: '0.5rem' }} />
-              Settle Split Bill ({parsedTotal.toFixed(4)} XLM)
-            </>
+            'Settle Split Bill'
           )}
         </button>
       </form>
