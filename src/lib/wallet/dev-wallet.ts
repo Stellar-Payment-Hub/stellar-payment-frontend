@@ -22,6 +22,15 @@ export const PRESET_DEV_ACCOUNTS: DevAccount[] = [
   },
 ];
 
+export function isDevWalletEnabled(): boolean {
+  // Restrict preset dev accounts strictly to non-production environments
+  return typeof process !== 'undefined' && process.env?.NODE_ENV === 'production' ? false : true;
+}
+
 export function getDevAccount(publicKey: string): DevAccount | undefined {
+  if (!isDevWalletEnabled()) {
+    return undefined;
+  }
   return PRESET_DEV_ACCOUNTS.find((a) => a.publicKey === publicKey);
 }
+
