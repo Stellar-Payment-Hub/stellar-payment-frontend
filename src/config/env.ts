@@ -32,7 +32,12 @@ export const STELLAR_CONFIG = {
     'CAGDS3H6GSNB7FSSFFDAAO5MX3GNVCUBNKIVUI52TAK7PXUUEXYCM66E',
   backendUrl:
     import.meta.env.VITE_BACKEND_URL ||
-    'http://localhost:4000',
+    (typeof window !== 'undefined' &&
+    window.location.hostname &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+      ? window.location.origin
+      : 'http://localhost:4000'),
 } as const;
 
 export type StellarConfig = typeof STELLAR_CONFIG;
