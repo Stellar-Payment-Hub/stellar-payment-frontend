@@ -2,6 +2,7 @@ import {
   TransactionBuilder,
   Operation,
   Address,
+  Account,
   nativeToScVal,
   scValToNative,
   xdr,
@@ -145,11 +146,10 @@ export async function readContractPayment(
   // 1. Try reading from Soroban RPC simulation
   try {
     const rpcServer = new rpc.Server(STELLAR_CONFIG.sorobanRpcUrl);
-    // Simulate get_payment(numericId)
-    const horizonServer = getHorizonServer();
-    // Use contract address or dummy public key to simulate read
-    const dummyAccount = await horizonServer.loadAccount(
-      'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5'
+    // Offline dummy Account object (Soroban simulateTransaction does not check sequence numbers)
+    const dummyAccount = new Account(
+      'GBBD47IF6LWK7P7MDEVSCWR7DPUWV3NY3DTQEVFL4NAT4AQH3ZLLFLA5',
+      '0'
     );
     
     const tx = new TransactionBuilder(dummyAccount, {

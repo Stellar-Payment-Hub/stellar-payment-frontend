@@ -396,13 +396,24 @@ class PaymentApiService {
 
   // --- Payment Requests ---
   public async getPaymentRequests(): Promise<TrackerPaymentRequest[]> {
+    try {
+      const res = await fetch(`${STELLAR_CONFIG.backendUrl}/api/payment-requests`, {
+        signal: AbortSignal.timeout(6000),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.requests) return data.requests;
+      }
+    } catch {
+      // Fallback
+    }
     return this.localRequests;
   }
 
   public async getPaymentRequestById(id: string): Promise<TrackerPaymentRequest | null> {
     try {
       const res = await fetch(`${STELLAR_CONFIG.backendUrl}/api/payment-requests/${id}`, {
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -424,7 +435,7 @@ class PaymentApiService {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
         const body = await res.json();
@@ -454,7 +465,7 @@ class PaymentApiService {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ paid_by: payer, transaction_hash: txHash }),
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) return true;
     } catch {
@@ -475,7 +486,7 @@ class PaymentApiService {
   public async getTransactions(): Promise<TrackerTransaction[]> {
     try {
       const res = await fetch(`${STELLAR_CONFIG.backendUrl}/api/transactions`, {
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
         const data = await res.json();
