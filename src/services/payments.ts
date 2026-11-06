@@ -221,7 +221,7 @@ class PaymentApiService {
       const url = new URL(`${STELLAR_CONFIG.backendUrl}/api/payments`);
       if (filterStatus) url.searchParams.append('status', filterStatus);
 
-      const res = await fetch(url.toString(), { signal: AbortSignal.timeout(2000) });
+      const res = await fetch(url.toString(), { signal: AbortSignal.timeout(6000) });
       if (res.ok) {
         const data = await res.json();
         if (data.payments) {
@@ -243,7 +243,7 @@ class PaymentApiService {
   ): Promise<{ payment: TrackerPayment; events: TrackerEvent[] } | null> {
     try {
       const res = await fetch(`${STELLAR_CONFIG.backendUrl}/api/payments/${id}`, {
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -286,7 +286,7 @@ class PaymentApiService {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newPayment),
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -307,7 +307,7 @@ class PaymentApiService {
       recipient_address: newPayment.recipient_address,
       amount: newPayment.amount,
       memo: newPayment.memo,
-      status: 'PENDING',
+      status: newPayment.transaction_hash ? 'PROCESSING' : 'PENDING',
       contract_address: STELLAR_CONFIG.contractId,
       transaction_hash: newPayment.transaction_hash,
       ledger: newPayment.ledger,
@@ -323,7 +323,7 @@ class PaymentApiService {
   public async getSettlements(): Promise<TrackerSettlement[]> {
     try {
       const res = await fetch(`${STELLAR_CONFIG.backendUrl}/api/settlements`, {
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -348,7 +348,7 @@ class PaymentApiService {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-        signal: AbortSignal.timeout(2000),
+        signal: AbortSignal.timeout(6000),
       });
       if (res.ok) {
         const data = await res.json();
@@ -362,6 +362,10 @@ class PaymentApiService {
     const formattedId = `SETTLE-${String(nextNum).padStart(3, '0')}`;
     const now = new Date().toISOString();
 
+    const initialStatus: TrackerSettlementStatus = payload.transaction_hash
+      ? 'COMPLETED'
+      : 'CREATED';
+
     const newSettle: TrackerSettlement = {
       id: formattedId,
       on_chain_id: nextNum,
@@ -369,7 +373,7 @@ class PaymentApiService {
       total_amount: payload.total_amount,
       recipient_count: payload.recipients.length,
       memo: payload.memo,
-      status: 'COMPLETED',
+      status: initialStatus,
       contract_address: STELLAR_CONFIG.settlementContractId,
       sub_payment_ids: payload.recipients.map((_, i) => `PAY-SUB-${i + 1}`),
       recipients: payload.recipients.map((r, i) => ({
@@ -377,7 +381,7 @@ class PaymentApiService {
         settlement_id: formattedId,
         recipient: r.recipient,
         amount: r.amount,
-        status: 'COMPLETED',
+        status: payload.transaction_hash ? 'COMPLETED' : 'PENDING',
         sub_payment_id: `PAY-SUB-${i + 1}`,
       })),
       transaction_hash: payload.transaction_hash,

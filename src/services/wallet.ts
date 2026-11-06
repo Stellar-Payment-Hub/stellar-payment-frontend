@@ -35,7 +35,7 @@ class WalletService {
       case 'freighter':
         return await isFreighterInstalled();
       case 'albedo':
-        return true; // Albedo is web/iframe-based and always accessible
+        return typeof window !== 'undefined' && Boolean((window as unknown as { albedo?: unknown }).albedo);
       case 'xbull':
         return typeof window !== 'undefined' && Boolean((window as unknown as { xbull?: unknown }).xbull);
       default:
@@ -50,15 +50,14 @@ class WalletService {
 
       case 'albedo':
         try {
-          // If window.albedo is present or web fallback
           if (typeof window !== 'undefined' && (window as unknown as { albedo?: { publicKey: () => Promise<{ pubkey: string }> } }).albedo) {
             const res = await (window as unknown as { albedo: { publicKey: () => Promise<{ pubkey: string }> } }).albedo.publicKey();
             return res.pubkey;
           }
-          // Fallback connection for demo/testnet
-          return 'GA5ZSEJYB37JRC5AVCIA5MOP4RHTM335X2KGX3IHOJAPP5RE34K4KZVN';
-        } catch {
-          throw new Error('Albedo authentication was cancelled or rejected.');
+          throw new Error('Albedo wallet was not detected. Please install or visit https://albedo.link');
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : String(err);
+          throw new Error(msg || 'Albedo authentication was cancelled or rejected.');
         }
 
       case 'xbull':
@@ -87,9 +86,23 @@ class WalletService {
         return await signTransactionWithFreighter(xdr, account);
 
       case 'albedo':
+        if (typeof window !== 'undefined' && (window as unknown as { albedo?: { tx: (opts: { xdr: string; network?: string }) => Promise<{ signed_envelope_xdr: string }> } }).albedo) {
+          const res = await (window as unknown as { albedo: { tx: (opts: { xdr: string; network?: string }) => Promise<{ signed_envelope_xdr: string }> } }).albedo.tx({
+            xdr,
+            network: 'testnet',
+          });
+          return res.signed_envelope_xdr;
+        }
+        throw new Error('Albedo wallet bridge is not available for transaction signing.');
+
       case 'xbull':
-        // If freighter is active or fallback signer
-        return await signTransactionWithFreighter(xdr, account);
+        if (typeof window !== 'undefined' && (window as unknown as { xbull?: { sign: (opts: { xdr: string; publicKey?: string }) => Promise<string> } }).xbull) {
+          return await (window as unknown as { xbull: { sign: (opts: { xdr: string; publicKey?: string }) => Promise<string> } }).xbull.sign({
+            xdr,
+            publicKey: account,
+          });
+        }
+        throw new Error('xBull wallet extension is not available for transaction signing.');
 
       default:
         throw new Error(`Cannot sign transaction with wallet: ${wallet}`);

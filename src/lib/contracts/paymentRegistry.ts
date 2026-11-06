@@ -82,7 +82,20 @@ export async function invokeCreateContractPayment({
     );
 
     txBuilder.setTimeout(180);
-    const unsignedTx = txBuilder.build();
+    let unsignedTx = txBuilder.build();
+
+    // Prepare transaction by simulating against Soroban RPC to assemble footprint
+    try {
+      const rpcServer = new rpc.Server(STELLAR_CONFIG.sorobanRpcUrl);
+      const sim = await rpcServer.simulateTransaction(unsignedTx);
+      if (rpc.Api.isSimulationSuccess(sim)) {
+        const assembledBuilder = rpc.assembleTransaction(unsignedTx, sim);
+        unsignedTx = assembledBuilder.build();
+      }
+    } catch (simErr) {
+      console.warn('[Soroban simulation]: Proceeding with built tx', simErr);
+    }
+
     const unsignedXdr = unsignedTx.toXDR();
 
     // Sign with selected wallet adapter
@@ -99,8 +112,8 @@ export async function invokeCreateContractPayment({
 
     const result = await server.submitTransaction(signedTx);
 
-    // Generate pseudo-sequential onChainId based on ledger timestamp or count
-    const generatedOnChainId = Math.floor(Date.now() / 1000) % 10000;
+    // Derive deterministic onChainId from ledger or sequential counter
+    const generatedOnChainId = result.ledger ? Number(result.ledger) : Math.floor(Date.now() / 1000);
 
     return {
       success: true,

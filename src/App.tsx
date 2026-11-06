@@ -18,6 +18,11 @@ import { PaymentTracker } from './components/tracker/PaymentTracker';
 import { TransactionHistoryView } from './components/transactions/TransactionHistoryView';
 import { WalletDetailView } from './components/wallet/WalletDetailView';
 import { DeveloperTestnetView } from './components/developer/DeveloperTestnetView';
+import { EscrowDashboard } from './components/escrow/EscrowDashboard';
+import { StreamingDashboard } from './components/streaming/StreamingDashboard';
+import { MerchantSubscriptionPortal } from './components/subscriptions/MerchantSubscriptionPortal';
+import { RemittanceHub } from './components/remittance/RemittanceHub';
+import { DisputeDashboard } from './components/disputes/DisputeDashboard';
 import { ThemeToggle } from './components/ui/ThemeToggle';
 import { OfflineBanner } from './components/ui/OfflineBanner';
 import { NetworkMismatchBanner } from './components/wallet/NetworkMismatchBanner';
@@ -36,6 +41,11 @@ import {
   Split,
   FileText,
   Heart,
+  Shield,
+  Activity,
+  RefreshCw,
+  Globe,
+  Scale,
 } from 'lucide-react';
 
 export type TabView =
@@ -43,6 +53,11 @@ export type TabView =
   | 'payments'
   | 'tracker'
   | 'transactions'
+  | 'escrow'
+  | 'streaming'
+  | 'subscriptions'
+  | 'remittance'
+  | 'disputes'
   | 'tipjar'
   | 'wallet'
   | 'developer';
@@ -180,6 +195,56 @@ export function App() {
         >
           <ArrowUpRight size={13} style={{ marginRight: '0.35rem', verticalAlign: '-1px' }} />
           Transactions
+        </button>
+
+        <button
+          type="button"
+          className={`filter-tab-btn ${activeTab === 'escrow' ? 'active' : ''}`}
+          onClick={() => setActiveTab('escrow')}
+          data-testid="tab-escrow"
+        >
+          <Shield size={13} style={{ marginRight: '0.35rem', verticalAlign: '-1px', color: '#10b981' }} />
+          Escrow
+        </button>
+
+        <button
+          type="button"
+          className={`filter-tab-btn ${activeTab === 'streaming' ? 'active' : ''}`}
+          onClick={() => setActiveTab('streaming')}
+          data-testid="tab-streaming"
+        >
+          <Activity size={13} style={{ marginRight: '0.35rem', verticalAlign: '-1px', color: '#06b6d4' }} />
+          Streaming
+        </button>
+
+        <button
+          type="button"
+          className={`filter-tab-btn ${activeTab === 'subscriptions' ? 'active' : ''}`}
+          onClick={() => setActiveTab('subscriptions')}
+          data-testid="tab-subscriptions"
+        >
+          <RefreshCw size={13} style={{ marginRight: '0.35rem', verticalAlign: '-1px', color: '#8b5cf6' }} />
+          Subscriptions
+        </button>
+
+        <button
+          type="button"
+          className={`filter-tab-btn ${activeTab === 'remittance' ? 'active' : ''}`}
+          onClick={() => setActiveTab('remittance')}
+          data-testid="tab-remittance"
+        >
+          <Globe size={13} style={{ marginRight: '0.35rem', verticalAlign: '-1px', color: '#3b82f6' }} />
+          Remittance
+        </button>
+
+        <button
+          type="button"
+          className={`filter-tab-btn ${activeTab === 'disputes' ? 'active' : ''}`}
+          onClick={() => setActiveTab('disputes')}
+          data-testid="tab-disputes"
+        >
+          <Scale size={13} style={{ marginRight: '0.35rem', verticalAlign: '-1px', color: '#f59e0b' }} />
+          Disputes
         </button>
 
         <button
@@ -555,7 +620,42 @@ export function App() {
         </main>
       )}
 
-      {/* View 5: Tip Jar */}
+      {/* View 5: Multi-Sig Escrow Vault */}
+      {activeTab === 'escrow' && (
+        <main style={{ maxWidth: '100%' }}>
+          <EscrowDashboard />
+        </main>
+      )}
+
+      {/* View 6: Real-Time Payment Streaming */}
+      {activeTab === 'streaming' && (
+        <main style={{ maxWidth: '100%' }}>
+          <StreamingDashboard />
+        </main>
+      )}
+
+      {/* View 7: Merchant Subscriptions */}
+      {activeTab === 'subscriptions' && (
+        <main style={{ maxWidth: '100%' }}>
+          <MerchantSubscriptionPortal />
+        </main>
+      )}
+
+      {/* View 8: Cross-Border Remittance Hub */}
+      {activeTab === 'remittance' && (
+        <main style={{ maxWidth: '100%' }}>
+          <RemittanceHub />
+        </main>
+      )}
+
+      {/* View 9: Dispute Resolution Center */}
+      {activeTab === 'disputes' && (
+        <main style={{ maxWidth: '100%' }}>
+          <DisputeDashboard />
+        </main>
+      )}
+
+      {/* View 10: Tip Jar */}
       {activeTab === 'tipjar' && (
         <main style={{ maxWidth: '100%' }}>
           <TipJarView
