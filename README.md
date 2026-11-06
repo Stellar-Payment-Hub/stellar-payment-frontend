@@ -1,14 +1,17 @@
 # Stellar Payment Hub - Frontend Application
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-stellar--payment--frontend.vercel.app-brightgreen.svg)](https://stellar-payment-frontend.vercel.app/)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org)
 [![Vite](https://img.shields.io/badge/Vite-6.4-purple.svg)](https://vitejs.dev)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-38bdf8.svg)](https://tailwindcss.com)
 [![Vitest](https://img.shields.io/badge/Tests-102%20Passing-success.svg)]()
+[![Stellar Testnet](https://img.shields.io/badge/Stellar-Testnet%20Verified-blue.svg)](https://stellar.expert/explorer/testnet)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Deploys: Vercel](https://img.shields.io/badge/Deployed-Vercel-black.svg)](https://vercel.com)
+[![Deploys: Vercel](https://img.shields.io/badge/Deployed-Vercel-black.svg)](https://stellar-payment-frontend.vercel.app/)
 
-The flagship decentralized web application for **Stellar Payment Hub**: featuring continuous real-time payment streaming, automated merchant direct debits, 2-of-3 multi-sig escrow arbitration, cross-border remittance via SEP-24 anchors, and enterprise treasury analytics.
+The flagship decentralized web application for **Stellar Payment Hub**: featuring continuous real-time payment streaming, automated merchant direct debits, 2-of-3 multi-sig escrow arbitration, cross-border remittance via SEP-24 anchors, native Vercel serverless API handlers, and enterprise treasury analytics.
+
+**Live Application**: [https://stellar-payment-frontend.vercel.app/](https://stellar-payment-frontend.vercel.app/)
 
 ---
 
@@ -88,19 +91,39 @@ npm run build
 
 ---
 
+## Native Serverless API & Routing Architecture
+
+The frontend is deployed as a unified SPA + Edge API on **Vercel** (`vercel.json`), providing instant zero-dependency backend endpoints:
+
+| Endpoint | Method | Scope |
+|---|---|---|
+| `/api/health` | `GET` | Service telemetry, Soroban RPC status, and contract addresses |
+| `/api/payments` | `GET`, `POST` | Payment query, indexing, and registration |
+| `/api/settlements` | `GET`, `POST` | Multi-recipient batch settlements |
+| `/api/payment-requests` | `GET`, `POST` | Shareable invoices and payment requests |
+| `/api/transactions` | `GET`, `POST` | Historical transaction ledger indexing |
+| `/api/assets` | `GET` | Supported testnet assets (XLM, USDC, EURC) |
+| `/api/analytics` | `GET` | Volume, count metrics, and system latency stats |
+| `/api/disputes` | `GET`, `POST` | Escrow arbitration dispute records |
+
+---
+
+## Deployed Soroban Smart Contracts (Stellar Testnet)
+
+The decentralized application connects to the verified, active smart contracts:
+
+- **PaymentRegistry**: [`CD5D7OITCBFJJDHQVEZ6Y7MYIZSWEVOCQO4ES7WZEWW3S37IGUVZAI7S`](https://stellar.expert/explorer/testnet/contract/CD5D7OITCBFJJDHQVEZ6Y7MYIZSWEVOCQO4ES7WZEWW3S37IGUVZAI7S)
+- **SettlementRouter**: [`CAGDS3H6GSNB7FSSFFDAAO5MX3GNVCUBNKIVUI52TAK7PXUUEXYCM66E`](https://stellar.expert/explorer/testnet/contract/CAGDS3H6GSNB7FSSFFDAAO5MX3GNVCUBNKIVUI52TAK7PXUUEXYCM66E)
+
+---
+
 ## Production Deployment (Vercel)
 
-The application is configured for deployment on **Vercel** with zero-configuration routing (`vercel.json`):
-
-```bash
-# Deploy to Vercel
-npx vercel --prod
-```
-
-Or connect the repository directly in the Vercel Dashboard:
+The application deploys automatically on **Vercel**:
 - **Framework Preset**: Vite
 - **Build Command**: `npm run build`
 - **Output Directory**: `dist`
+- **Routing Configuration**: `vercel.json` provides SPA fallback with `((?!api/).*)` alongside native `/api` serverless execution.
 
 ---
 
