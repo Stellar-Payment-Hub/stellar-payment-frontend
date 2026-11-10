@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { STELLAR_CONFIG } from './config/env';
 import { useWallet } from './hooks/useWallet';
 import { useBalance } from './hooks/useBalance';
 import { usePayment } from './hooks/usePayment';
@@ -460,7 +461,7 @@ export function App() {
                 <h4 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>Soroban Smart Engine Online</h4>
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: 0, lineHeight: 1.5 }}>
-                Operating with dual Soroban smart contracts: <strong>SettlementRouter</strong> (<code>CBX7MK...7U1E</code>) and <strong>PaymentRegistry</strong> (<code>CCBUEU...ETGY</code>) with verified inter-contract invocation, real-time event streaming, and multi-address settlement.
+                Operating with dual Soroban smart contracts: <strong>SettlementRouter</strong> (<code>{STELLAR_CONFIG.settlementContractId.slice(0, 6)}...{STELLAR_CONFIG.settlementContractId.slice(-4)}</code>) and <strong>PaymentRegistry</strong> (<code>{STELLAR_CONFIG.contractId.slice(0, 6)}...{STELLAR_CONFIG.contractId.slice(-4)}</code>) with verified inter-contract invocation, real-time event streaming, and multi-address settlement.
               </p>
             </div>
           </div>

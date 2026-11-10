@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LiveStreamEntity } from '../../types/stream';
+import { useWallet } from '../../hooks/useWallet';
 import { StreamFlowMeter } from './StreamFlowMeter';
 import { StreamCard } from './StreamCard';
 import { StreamFilterTabs } from './StreamFilterTabs';
@@ -9,6 +10,7 @@ import { WithdrawStreamModal } from './WithdrawStreamModal';
 import { EmptyStreamState } from './EmptyStreamState';
 
 export const StreamingDashboard: React.FC = () => {
+  const { address } = useWallet();
   const [streams, setStreams] = useState<LiveStreamEntity[]>([
     {
       id: 'stream-1',
@@ -32,7 +34,7 @@ export const StreamingDashboard: React.FC = () => {
   const handleCreate = (data: any) => {
     const newStream: LiveStreamEntity = {
       id: `stream-${streams.length + 1}`,
-      sender: 'GBMYCONNECTEDWALLET7777777777777777777777777777777777777777',
+      sender: address || 'GBMYCONNECTEDWALLET7777777777777777777777777777777777777777',
       recipient: data.recipient,
       token: data.token,
       tokenSymbol: data.token,

@@ -6,6 +6,37 @@ import { STELLAR_CONFIG } from '../config/env';
 const STORAGE_CONNECTED_KEY = 'sph_wallet_connected';
 const STORAGE_TYPE_KEY = 'sph_wallet_type';
 
+const safeStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.getItem === 'function') {
+        return window.localStorage.getItem(key);
+      }
+      return null;
+    } catch {
+      return null;
+    }
+  },
+  setItem: (key: string, value: string): void => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.setItem === 'function') {
+        window.localStorage.setItem(key, value);
+      }
+    } catch {
+      // ignore
+    }
+  },
+  removeItem: (key: string): void => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage && typeof window.localStorage.removeItem === 'function') {
+        window.localStorage.removeItem(key);
+      }
+    } catch {
+      // ignore
+    }
+  },
+};
+
 export function useWallet() {
   const [status, setStatus] = useState<WalletStatusState>('disconnected');
   const [address, setAddress] = useState<string | null>(null);
@@ -15,8 +46,8 @@ export function useWallet() {
 
   // Check saved connection on mount
   useEffect(() => {
-    const wasConnected = localStorage.getItem(STORAGE_CONNECTED_KEY);
-    const savedType = localStorage.getItem(STORAGE_TYPE_KEY) as WalletType | null;
+    const wasConnected = safeStorage.getItem(STORAGE_CONNECTED_KEY);
+    const savedType = safeStorage.getItem(STORAGE_TYPE_KEY) as WalletType | null;
 
     if (wasConnected === 'true' && savedType) {
       // Re-hydrate connection silently
@@ -28,8 +59,8 @@ export function useWallet() {
           setStatus('connected');
         })
         .catch(() => {
-          localStorage.removeItem(STORAGE_CONNECTED_KEY);
-          localStorage.removeItem(STORAGE_TYPE_KEY);
+          safeStorage.removeItem(STORAGE_CONNECTED_KEY);
+          safeStorage.removeItem(STORAGE_TYPE_KEY);
         });
     }
   }, []);
@@ -45,8 +76,8 @@ export function useWallet() {
       setStatus('connected');
       setIsSelectModalOpen(false);
 
-      localStorage.setItem(STORAGE_CONNECTED_KEY, 'true');
-      localStorage.setItem(STORAGE_TYPE_KEY, walletType);
+      safeStorage.setItem(STORAGE_CONNECTED_KEY, 'true');
+      safeStorage.setItem(STORAGE_TYPE_KEY, walletType);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to connect wallet';
 
@@ -68,8 +99,8 @@ export function useWallet() {
     setStatus('disconnected');
     setError(null);
 
-    localStorage.removeItem(STORAGE_CONNECTED_KEY);
-    localStorage.removeItem(STORAGE_TYPE_KEY);
+    safeStorage.removeItem(STORAGE_CONNECTED_KEY);
+    safeStorage.removeItem(STORAGE_TYPE_KEY);
   }, []);
 
   const openSelectModal = useCallback(() => {
